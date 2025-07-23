@@ -23,7 +23,7 @@ def carica_cliente():
         cliente_config = doc.to_dict()
         g.config = cliente_config
         g.cliente_id = cliente_config["cliente_id"]
-        g.db = firestore.Client(project="mireamakeup", database=cliente_config["firestore_db_id"])
+        g.db = firestore.Client(database=cliente_config["firestore_db_id"])
 
         info_doc = g.db.collection("config").document("info").get()
         g.config_ui = info_doc.to_dict() if info_doc.exists else {}
@@ -77,7 +77,7 @@ def verifica_bucket_clienti():
 
         # 🔁 Salva bucket_name nel Firestore del cliente (config > info)
         try:
-            db_cliente = firestore.Client(project="mireamakeup", database=firestore_db_id)
+            db_cliente = firestore.Client(database=firestore_db_id)
             config_ref = db_cliente.collection("config").document("info")
             config_ref.set({"bucket_name": bucket_name}, merge=True)
             print(f"📌 Aggiornato campo bucket_name per {cliente_id} in {firestore_db_id}")

@@ -12,35 +12,32 @@ def elabora_immagine():
         foto_id = data.get("foto_id")
         filename = data.get("filename")
         cliente_id = data.get("cliente_id")
-        filename = data.get("filename")
 
         if not foto_id or not filename or not cliente_id:
-            print("❌ Task ricevuto senza foto_id o filename")
+            print("❌ Task ricevuto senza foto_id, filename, o cliente_id")
             return jsonify({"error": "Dati mancanti"}), 400
 
-        print(f"📥 Task ricevuto: {foto_id} - {filename}")
-        bucket_name = f"foto{cliente_id}"
-        storage_client = storage.Client()
-        bucket = storage_client.bucket(bucket_name)
+        print(f"📥 Task ricevuto: {cliente_id} - {foto_id} - {filename}")
 
-        # Recupera il project_id dal cliente
+        # Get client config from central DB
         central_db = firestore.Client()
-        doc = central_db.collection("clienti_config").document(cliente_id).get()
-        if not doc.exists:
+        client_doc = central_db.collection("clienti_config").document(cliente_id).get()
+        if not client_doc.exists:
             return jsonify({"error": "Cliente non trovato"}), 404
 
-        project_id = doc.to_dict().get("firestore_project_id")
-        if not project_id:
-            return jsonify({"error": "Progetto Firestore mancante"}), 500
+        client_config = client_doc.to_dict()
+        firestore_db_id = client_config.get("firestore_db_id")
+        bucket_name = f"foto{cliente_id}" # Or get from config if stored there
 
-        db = firestore.Client(project=project_id)
+        if not firestore_db_id:
+            return jsonify({"error": "Database cliente non configurato"}), 500
 
-
-        bucket_name = "fotomireamakeup"
+        # Initialize tenant-specific clients
+        db = firestore.Client(database=firestore_db_id)
         storage_client = storage.Client()
         bucket = storage_client.bucket(bucket_name)
 
-        # Scarica immagine originale
+        # Download original image
         blob_path = f"foto/originals/{filename}"
         original_blob = bucket.blob(blob_path)
 
@@ -56,11 +53,11 @@ def elabora_immagine():
             print(f"❌ Immagine non valida: {filename} – {e}")
             return jsonify({"error": "Immagine non valida"}), 400
 
-        # Crea versioni
+        # Create versions
         thumb = resize_image(image, 300)
         web = resize_image(image, 1200)
 
-        # Carica su GCS
+        # Upload to GCS
         thumb_path = f"foto/thumb/{filename}"
         web_path = f"foto/web/{filename}"
 
@@ -69,16 +66,15 @@ def elabora_immagine():
 
         print(f"📤 Versioni caricate: {thumb_path}, {web_path}")
 
-        # Link pubblici
+        # Public links
         base_url = f"https://storage.googleapis.com/{bucket_name}"
         links = {
-            "original": f"{base_url}/foto/originals/{filename}",
-            "web": f"{base_url}/foto/web/{filename}",
-            "thumb": f"{base_url}/foto/thumb/{filename}",
+            "original": f"{base_url}/{blob_path}",
+            "web": f"{base_url}/{web_path}",
+            "thumb": f"{base_url}/{thumb_path}",
         }
 
-        # Salva su Firestore
-        db = firestore.Client()
+        # Save to Firestore
         db.collection("foto_pubbliche").document(foto_id).set({
             **links,
             "timestamp": firestore.SERVER_TIMESTAMP
