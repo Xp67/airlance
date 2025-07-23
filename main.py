@@ -55,6 +55,7 @@ def inizializza_dati_cliente(db):
     config_doc = config_ref.get()
 
     if not config_doc.exists or not config_doc.to_dict().get("roles_initialized"):
+
         print(f"✨ Inizializzazione dati per il database...")
         db.collection("roles").document("admin").set({"nome": "Amministratore"})
         db.collection("roles").document("user").set({"nome": "Utente"})
@@ -79,6 +80,7 @@ def inizializza_dati_cliente(db):
 
         config_ref.set({"roles_initialized": True}, merge=True)
         print("✅ Inizializzazione completata.")
+
 def verifica_bucket_clienti():
     print("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()
