@@ -29,6 +29,8 @@ def carica_cliente():
         g.config_ui = info_doc.to_dict() if info_doc.exists else {}
         g.bucket_name = g.config_ui.get("bucket_name", f"foto{g.cliente_id}")
         
+        inizializza_dati_cliente(g.db)
+
         if not hasattr(g, "template_loader_set") or g.template_loader_set != g.cliente_id:
             set_jinja_loader_per_cliente(g.cliente_id)
             g.template_loader_set = g.cliente_id
@@ -47,6 +49,17 @@ def set_jinja_loader_per_cliente(cliente_id):
         FileSystemLoader(os.path.join("clienti", cliente_id, "templates")),
         FileSystemLoader("templates")  # fallback globale
     ])
+
+def inizializza_dati_cliente(db):
+    config_ref = db.collection("config").document("init")
+    config_doc = config_ref.get()
+
+    if not config_doc.exists or not config_doc.to_dict().get("roles_initialized"):
+        print(f"✨ Inizializzazione ruoli per il database...")
+        db.collection("roles").document("admin").set({"nome": "Amministratore"})
+        db.collection("roles").document("user").set({"nome": "Utente"})
+        config_ref.set({"roles_initialized": True}, merge=True)
+        print("✅ Ruoli creati.")
 def verifica_bucket_clienti():
     print("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()
