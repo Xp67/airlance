@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, request, session, url_for, render_template, g  # type: ignore
 import requests  # type: ignore
 import os
-from services.firestore import utente_esiste, get_ruoli_utente
+from services.firestore import utente_esiste, get_ruoli_utente, crea_utente
 
 auth = Blueprint('auth', __name__)
 
