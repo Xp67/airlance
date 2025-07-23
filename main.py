@@ -55,11 +55,32 @@ def inizializza_dati_cliente(db):
     config_doc = config_ref.get()
 
     if not config_doc.exists or not config_doc.to_dict().get("roles_initialized"):
-        print(f"✨ Inizializzazione ruoli per il database...")
+
+        print(f"✨ Inizializzazione dati per il database...")
         db.collection("roles").document("admin").set({"nome": "Amministratore"})
         db.collection("roles").document("user").set({"nome": "Utente"})
+
+        # Ensure admin user exists
+        admin_email = "marco.def4lt@gmail.com"
+        admin_ref = db.collection("utenti").document(admin_email)
+        admin_doc = admin_ref.get()
+
+        if not admin_doc.exists:
+            admin_ref.set({
+                "email": admin_email,
+                "nome": "Marco",
+                "ruoli": ["admin"]
+            })
+            print(f"✅ Creato utente admin: {admin_email}")
+        else:
+            admin_ref.update({
+                "ruoli": firestore.ArrayUnion(["admin"])
+            })
+            print(f"✅ Assicurato ruolo admin per: {admin_email}")
+
         config_ref.set({"roles_initialized": True}, merge=True)
-        print("✅ Ruoli creati.")
+        print("✅ Inizializzazione completata.")
+
 def verifica_bucket_clienti():
     print("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()
