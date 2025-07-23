@@ -23,12 +23,14 @@ def carica_cliente():
         cliente_config = doc.to_dict()
         g.config = cliente_config
         g.cliente_id = cliente_config["cliente_id"]
-        g.db = firestore.Client(project="mireamakeup", database=cliente_config["firestore_db_id"])
+        g.db = firestore.Client(database=cliente_config["firestore_db_id"])
 
         info_doc = g.db.collection("config").document("info").get()
         g.config_ui = info_doc.to_dict() if info_doc.exists else {}
         g.bucket_name = g.config_ui.get("bucket_name", f"foto{g.cliente_id}")
         
+        inizializza_dati_cliente(g.db)
+
         if not hasattr(g, "template_loader_set") or g.template_loader_set != g.cliente_id:
             set_jinja_loader_per_cliente(g.cliente_id)
             g.template_loader_set = g.cliente_id
@@ -47,6 +49,36 @@ def set_jinja_loader_per_cliente(cliente_id):
         FileSystemLoader(os.path.join("clienti", cliente_id, "templates")),
         FileSystemLoader("templates")  # fallback globale
     ])
+
+def inizializza_dati_cliente(db):
+    config_ref = db.collection("config").document("init")
+    config_doc = config_ref.get()
+
+    if not config_doc.exists or not config_doc.to_dict().get("roles_initialized"):
+        print(f"✨ Inizializzazione dati per il database...")
+        db.collection("roles").document("admin").set({"nome": "Amministratore"})
+        db.collection("roles").document("user").set({"nome": "Utente"})
+
+        # Ensure admin user exists
+        admin_email = "marco.def4lt@gmail.com"
+        admin_ref = db.collection("utenti").document(admin_email)
+        admin_doc = admin_ref.get()
+
+        if not admin_doc.exists:
+            admin_ref.set({
+                "email": admin_email,
+                "nome": "Marco",
+                "ruoli": ["admin"]
+            })
+            print(f"✅ Creato utente admin: {admin_email}")
+        else:
+            admin_ref.update({
+                "ruoli": firestore.ArrayUnion(["admin"])
+            })
+            print(f"✅ Assicurato ruolo admin per: {admin_email}")
+
+        config_ref.set({"roles_initialized": True}, merge=True)
+        print("✅ Inizializzazione completata.")
 def verifica_bucket_clienti():
     print("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()
@@ -77,7 +109,7 @@ def verifica_bucket_clienti():
 
         # 🔁 Salva bucket_name nel Firestore del cliente (config > info)
         try:
-            db_cliente = firestore.Client(project="mireamakeup", database=firestore_db_id)
+            db_cliente = firestore.Client(database=firestore_db_id)
             config_ref = db_cliente.collection("config").document("info")
             config_ref.set({"bucket_name": bucket_name}, merge=True)
             print(f"📌 Aggiornato campo bucket_name per {cliente_id} in {firestore_db_id}")
