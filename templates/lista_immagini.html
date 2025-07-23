@@ -1,0 +1,68 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+  <div class="dashboard-content">
+    <h1 class="titolo-sezione">Immagini Caricate</h1>
+
+    <form method="get" style="margin-bottom: 20px;">
+      <input type="text" name="query" placeholder="Filtra per ID o raccolta" value="{{ request.args.get('query', '') }}">
+      <button type="submit" class="profile-btn">Filtra</button>
+    </form>
+
+    <div class="raccolte-grid">
+      {% for img in immagini %}
+        <div class="raccolta-card">
+          <img src="{{ img.thumb or img.web or img.original }}" alt="immagine {{ img.id }}">
+          <h3>{{ img.nome or img.id }}</h3>
+          <p style="font-size: 12px;">
+            Raccolte:
+            {% if img.raccolte %}
+                {% for r in img.raccolte %}
+                <a href="{{ url_for('admin.lista_immagini') }}?query={{ r }}" class="badge badge-clickable">{{ r }}</a>
+                {% endfor %}
+            {% else %}
+                <em>—</em>
+            {% endif %}
+          </p>
+
+          <button class="profile-btn"
+             onclick='apriPopupImmagine({{ img.id|tojson }}, {{ img.nome|default("")|tojson }}, {{ img.original|default("")|tojson }})'>
+             Gestisci
+          </button>
+
+
+
+        </div>
+      {% else %}
+        <p>Nessuna immagine trovata.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+
+
+  <!-- POPUP GESTIONE IMMAGINE -->
+
+  <div id="popup-immagine" class="popup">
+    <div class="popup-content">
+        <h2>Gestisci immagine</h2>
+        <input type="hidden" id="popup-img-id">
+        <label>Nome esposto:</label>
+        <input type="text" id="popup-img-nome" placeholder="Nome esposto">
+        
+        <div style="margin-top: 1rem;">
+        <button class="profile-btn" onclick="salvaNomeImmagine()">💾 Salva</button>
+        <a id="popup-img-download" class="profile-btn" target="_blank">⬇️ Scarica originale</a>
+        <form id="form-elimina-img" method="post" style="display: inline;" onsubmit="return confermaElimina()">
+            <button type="submit" class="profile-btn danger">🗑️ Elimina</button>
+        </form>
+        </div>
+        
+        <button onclick="chiudiPopupImmagine()" class="profile-btn" style="margin-top: 20px;">Chiudi</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/lista_immagini.js') }}"></script>
+
+
+{% endblock %}

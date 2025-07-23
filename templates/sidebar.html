@@ -1,0 +1,26 @@
+<div class="sidebar">
+
+  <div class="sidebar-header">
+    <a href="{{ url_for('index') }}" class="logo-container" >
+      <img src="{{ url_for('static_cliente', filename='img/logo.png') }}" alt="Logo">
+
+    </a>
+    <h3>Benvenuto</h3>
+  </div>
+
+
+ <nav class="sidebar-nav">
+
+  {% if request.endpoint.startswith('user.') %}
+    <a href="{{ url_for('user.profilo') }}">Profilo</a>
+    
+
+  {% elif request.endpoint.startswith('admin.') %}
+
+    <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin.carica_immagini') }}">Carica immagini</a>
+    <a href="{{ url_for('admin.gestione_raccolte') }}">Raccolte</a>
+    <a href="{{ url_for('admin.lista_immagini') }}">Lista Immagini</a>
+
+  {% endif %}
+</div>

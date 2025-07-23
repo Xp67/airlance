@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+
+
+{% block sidebar %}
+{% include "sidebar.html"%}
+{% endblock %}
+
+{% block content %}
+  <!-- Contenuto principale -->
+  <div class="dashboard-content">
+  <div class="user-header">
+    <img src="{{ user.picture }}" alt="Foto profilo" class="user-photo">
+    <h2 class="user-name">{{ user.name }}</h2>
+  </div>
+
+  <h2 class="titolo-sezione">Dati utente</h2>
+  <table class="user-info-table">
+    <tr>
+      <th>Email</th>
+      <td>{{ user.email }}</td>
+    </tr>
+    
+  </table>
+</div>
+
+{% endblock %}

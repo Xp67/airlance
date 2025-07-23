@@ -1,0 +1,26 @@
+{% include "head.html" %}
+{% include "dashboard.html" %}
+
+
+
+ <div class="page-wrapper">
+{% block sidebar %}
+{% endblock %}
+
+<body data-cliente-id="{{ CLIENTE_ID }}">
+{% block content %}
+
+<section class="hero">
+ <h1>{{ config.hero_title or 'Benvenuto nel fallback' }}</h1>
+ <p>{{ config.hero_subtitle or 'Scopri i nostri fallback' }}</p>
+
+</section>
+
+{% endblock %}
+
+
+
+</div>
+
+
+{% include "footer.html" %}

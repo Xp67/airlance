@@ -1,0 +1,97 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+  <!-- Contenuto principale -->
+
+<div class="raccolte-wrapper">
+  <button class="btn-upload nuova-raccolta-btn" onclick="apriPopupCreazione()">➕ Nuova raccolta</button>
+
+  {% if raccolte %}
+  <div class="raccolte-grid">
+    {% for r in raccolte %}
+      <div class="raccolta-card">
+        <img src="{{ r.copertina or '/static/img/placeholder.jpg' }}" alt="copertina">
+        <h4>{{ r.nome }}</h4>
+        <button onclick="apriPopup('{{ r.id }}')">Apri</button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+
+<div id="popup-nuova-raccolta" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="chiudiPopupCreazione()">X</button>
+    <h2>Crea nuova raccolta</h2>
+
+    <label for="nome-nuovo">Nome raccolta</label>
+    <input id="nome-nuovo" type="text" placeholder="es. look_estate_2025">
+
+    <label for="descrizione-nuovo">Descrizione</label>
+    <input id="descrizione-nuovo" type="text" placeholder="es. raccolta estiva 2025">
+
+    <button class="btn-upload" onclick="apriPopupSelezione()">Scegli immagini</button>
+
+    <div id="preview-immagini-scelte" class="immagini-thumb" style="margin-top: 1rem;"></div>
+
+    <button class="btn-upload" onclick="salvaNuovaRaccolta()">Crea</button>
+  </div>
+</div>
+
+
+<div id="popup-selezione-immagini" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="chiudiPopupSelezione()">X</button>
+    <h3>Seleziona immagini</h3>
+    <div id="tutte-le-immagini" class="immagini-thumb"></div>
+    <button class="btn-upload" onclick="confermaSelezioneImmagini()">Conferma selezione</button>
+  </div>
+</div>
+
+
+<div id="popup-raccolta" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="chiudiPopup()">X</button>
+    <form id="form-modifica-raccolta" enctype="multipart/form-data">
+
+
+      <div class="popup-header">
+        <img id="copertina-popup" src="" alt="Copertina" style="width: 120px;">
+        <div style="flex-grow: 1;">
+            <input id="nome-popup" name="nome" type="text" placeholder="Nome raccolta">
+            <input id="descrizione-popup" name="descrizione" type="text" placeholder="Descrizione raccolta">
+            <input type="hidden" id="id-popup" name="id">
+            <input type="file" id="nuova-copertina" name="copertina" accept="image/*">
+        </div>
+      </div>
+
+      <div id="immagini-popup" class="immagini-thumb" style="margin-top: 1rem;"></div>
+      
+      <button type="button" onclick="apriPopupSelezioneModifica()">➕ Aggiungi immagini</button>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <button type="button" class="btn-upload" onclick="salvaModificheRaccolta()">Salva</button>
+        <button type="button" class="btn-danger" onclick="eliminaRaccolta()">Elimina</button>
+      </div>
+
+
+    </form>
+  </div>
+</div>
+
+<div id="popup-selezione-immagini-modifica" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="chiudiPopupSelezioneModifica()">X</button>
+    <h3>Seleziona immagini da aggiungere</h3>
+    <div id="tutte-le-immagini-modifica" class="immagini-thumb"></div>
+    <button class="btn-upload" onclick="confermaSelezioneImmaginiModifica()">Conferma selezione</button>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/raccolte.js') }}"></script>
+
+
+
+{% endblock %}

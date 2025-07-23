@@ -1,0 +1,31 @@
+
+
+<nav class="dashboard-nav">
+  <div class="logo">{{ TITOLO_SITO }}</div>
+  <ul class="menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/portfolio">Portfolio</a></li>
+    <li><a href="/servizi">Servizi</a></li>
+    <li><a href="/contatti">Contatti</a></li>
+    {% if user.email in WHITELIST %}
+    <li><a href="{{ url_for('admin.admin_dashboard') }}">Area Admin</a></li>
+  
+    {% endif %}
+  </ul>
+  
+  <a href="{{ url_for('auth.login') if not user else url_for('user.profilo') }}"
+   class="profile-btn">
+  {% if user %}
+    <div class="profile-content">
+      <img src="{{ user.picture }}" alt="profile" class="profile-img">
+      <span>{{ user.name }}</span>
+      <form method="post" action="/logout" class="logout-form">
+        <button href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</button>
+      </form>
+      
+    </div>
+  {% else %}
+    <span>Sign In / Log In</span>
+  {% endif %}
+</a>
+</nav>

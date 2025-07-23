@@ -1,0 +1,35 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+  <!-- Contenuto principale -->
+
+<div class="upload-container">
+  <div class="upload-form">
+    <h2>Carica una nuova immagine</h2>
+
+    <label for="file">Seleziona immagini</label>
+    <input type="file" id="upload-file" accept="image/*" multiple required>
+
+    <button type="button" onclick="uploadFotoFetch('upload-file')">Carica immagine</button>
+  </div>
+</div>
+
+{% if immagini %}
+  <div class="recent-uploads">
+    <h3>Ultime immagini caricate</h3>
+    <div class="image-list">
+      {% for img in immagini %}
+        <div class="image-card">
+          <img src="{{ img.thumb }}" alt="{{ img.id }}">
+          <p><strong>{{ img.id }}</strong></p>
+          <a href="{{ img.web }}" target="_blank">Versione media</a> |
+          <a href="{{ img.original }}" target="_blank">Originale</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+
+<script src="{{ url_for('static', filename='js/upload_ui.js') }}"></script>
+{% endblock %}

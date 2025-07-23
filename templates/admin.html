@@ -1,0 +1,15 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+<div class="dashboard-content">
+    <h1 class="titolo-sezione">Pannello Amministratore</h1>
+
+    <div class="user-header">
+        <img src="{{ session.user.picture }}" class="user-photo" alt="Avatar">
+        <div>
+            <p class="user-name">{{ session.user.name }}</p>
+            <p>{{ session.user.email }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
