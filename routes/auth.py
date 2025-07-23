@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, session, url_for, render_template  # type: ignore
+from flask import Blueprint, redirect, request, session, url_for, render_template, g  # type: ignore
 import requests  # type: ignore
 import os
 from services.firestore import utente_esiste, get_ruoli_utente
@@ -71,8 +71,8 @@ def callback():
         return "Utente non verificato", 400
 
     # ✅ Se l’utente è registrato, carica i ruoli e salva tutto in sessione
-    if utente_esiste(userinfo["email"]):
-        ruoli = get_ruoli_utente(userinfo["email"])
+    if utente_esiste(g.db, userinfo["email"]):
+        ruoli = get_ruoli_utente(g.db, userinfo["email"])
 
         session["user"] = {
             "email": userinfo["email"],

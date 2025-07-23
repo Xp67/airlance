@@ -6,6 +6,7 @@ import json
 from werkzeug.utils import secure_filename # type: ignore
 import os
 from services.storage import firma_url
+from services.decorators import admin_required
 
 
 
@@ -16,10 +17,12 @@ admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
 
 
 @admin_bp.route("/admin_dashboard")
+@admin_required
 def admin_dashboard():
     return render_template("admin.html")
 
 @admin_bp.route('/carica-immagini')
+@admin_required
 def carica_immagini():
     # g.db è già configurato per puntare al Firestore del tenant corrente
     foto_ref = g.db.collection("foto_pubbliche") \
@@ -44,12 +47,14 @@ def carica_immagini():
 
 
 @admin_bp.route("/raccolte", methods=["GET"])
+@admin_required
 def gestione_raccolte():
     docs = g.db.collection("raccolte").stream()
     raccolte = [{"id": doc.id, **doc.to_dict()} for doc in docs]
     return render_template("gestione_raccolte.html", raccolte=raccolte)
 
 @admin_bp.route("/immagini/tutte")
+@admin_required
 def tutte_immagini():
     docs = g.db.collection("foto_pubbliche").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(100).stream()
     immagini = []
@@ -65,6 +70,7 @@ def tutte_immagini():
 
 
 @admin_bp.route("/raccolte/crea", methods=["POST"])
+@admin_required
 def crea_raccolta_post():
     data = request.get_json()
     print("📥 JSON ricevuto:", data)
@@ -109,6 +115,7 @@ def crea_raccolta_post():
     return jsonify({"success": True}), 200
 
 @admin_bp.route("/raccolte/elimina", methods=["POST"])
+@admin_required
 def elimina_raccolta():
     data = request.get_json()
     raccolta_id = data.get("id", "").strip()
@@ -130,6 +137,7 @@ def elimina_raccolta():
     return jsonify({"success": True})
 
 @admin_bp.route("/raccolte/dettaglio/<raccolta_id>")
+@admin_required
 def dettaglio_raccolta(raccolta_id):
     raccolta_ref = g.db.collection("raccolte").document(raccolta_id)
     raccolta_doc = raccolta_ref.get()
@@ -161,6 +169,7 @@ def dettaglio_raccolta(raccolta_id):
     })
 
 @admin_bp.route("/raccolte/update", methods=["POST"])
+@admin_required
 def aggiorna_raccolta():
     id_vecchio = request.form.get("id")
     nome_nuovo = request.form.get("nome", "").strip()
@@ -247,6 +256,7 @@ def aggiorna_raccolta():
 
 
 @admin_bp.route("/postprocess", methods=["POST"])
+@admin_required
 def postprocess():
     data = request.get_json()
     foto_id = data.get("foto_id")
@@ -258,7 +268,7 @@ def postprocess():
     client = tasks_v2.CloudTasksClient()
 
     # ✅ Usa il progetto centrale (non quello del cliente)
-    project = "mireamakeup"  # o centralizzato
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT")
     queue = "upload-queue"
     location = "europe-west6"
     url = url_for("task.elabora_immagine", _external=True)
@@ -285,6 +295,7 @@ def postprocess():
     return jsonify({"queued": True})
 
 @admin_bp.route("/signed-upload-url", methods=["POST"])
+@admin_required
 def signed_upload_url():
     data = request.get_json()
     filename = data.get("filename", "").strip()
@@ -296,7 +307,7 @@ def signed_upload_url():
 
     blob_path = f"foto/originals/{filename}"
     try:
-        url = firma_url(blob_path, metodo="PUT", durata_minuti=10, content_type=content_type)
+        url = firma_url(g.bucket_name, blob_path, metodo="PUT", durata_minuti=10, content_type=content_type)
         public_url = f"https://storage.googleapis.com/{g.bucket_name}/{blob_path}"
         return jsonify({"url": url, "public_url": public_url})
     except Exception as e:
@@ -304,6 +315,7 @@ def signed_upload_url():
         return jsonify({"error": "errore generazione signed URL"}), 500
     
 @admin_bp.route("/immagini", endpoint="lista_immagini")
+@admin_required
 def lista_immagini():
     from google.cloud import firestore
     
@@ -328,6 +340,7 @@ def lista_immagini():
     return render_template("lista_immagini.html", immagini=dati)
 
 @admin_bp.route("/immagini/elimina/<id>", methods=["POST"], endpoint="elimina_immagine")
+@admin_required
 def elimina_immagine(id):
     from google.cloud import storage, firestore
 
@@ -349,6 +362,7 @@ def elimina_immagine(id):
     return redirect(url_for("admin.lista_immagini"))
 
 @admin_bp.route("/immagini/update_nome", methods=["POST"])
+@admin_required
 def aggiorna_nome_immagine():
     id_img = request.form.get("id")
     nuovo_nome = request.form.get("nome", "").strip()
