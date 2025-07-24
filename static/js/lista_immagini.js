@@ -1,3 +1,4 @@
+
 function apriPopupImmagine(id, nome, url) {
   document.getElementById("popup-img-id").value = id;
   document.getElementById("popup-img-nome").value = nome || "";
@@ -33,3 +34,4 @@ function salvaNomeImmagine() {
 function confermaElimina() {
   return confirm("Vuoi davvero eliminare questa immagine?");
 }
+
