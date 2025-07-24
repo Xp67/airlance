@@ -321,7 +321,9 @@ def lista_immagini():
     
     query = request.args.get("query", "").strip().lower()
 
-    immagini_ref = g.db.collection("foto_pubbliche").order_by("timestamp", direction=firestore.Query.DESCENDING)
+    immagini_ref = g.db.collection("foto_pubbliche").order_by(
+        "timestamp", direction=firestore.Query.DESCENDING
+    )
     immagini = immagini_ref.stream()
 
     dati = []
@@ -329,11 +331,9 @@ def lista_immagini():
         item = doc.to_dict()
         item["id"] = doc.id
 
-        if query:
-            raccolte = [r.lower() for r in item.get("raccolte", [])]
-        if query not in item["id"].lower() and query not in raccolte:
+        raccolte = [r.lower() for r in item.get("raccolte", [])]
+        if query and query not in item["id"].lower() and query not in raccolte:
             continue
-
 
         dati.append(item)
 
