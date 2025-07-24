@@ -79,6 +79,17 @@ def inizializza_dati_cliente(db):
 
         config_ref.set({"roles_initialized": True}, merge=True)
         print("✅ Inizializzazione completata.")
+
+    # Inizializza collezione servizi se assente
+    if not any(db.collection("servizi").limit(1).stream()):
+        db.collection("servizi").document("esempio").set({
+            "nome": "Servizio di esempio",
+            "descrizione": "Descrizione di esempio",
+            "immagine": "",
+            "costo": "",
+            "durata": ""
+        })
+        print("✅ Collezione 'servizi' inizializzata")
 def verifica_bucket_clienti():
     print("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()

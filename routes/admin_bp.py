@@ -322,7 +322,9 @@ def lista_immagini():
     
     query = request.args.get("query", "").strip().lower()
 
-    immagini_ref = g.db.collection("foto_pubbliche").order_by("timestamp", direction=firestore.Query.DESCENDING)
+    immagini_ref = g.db.collection("foto_pubbliche").order_by(
+        "timestamp", direction=firestore.Query.DESCENDING
+    )
     immagini = immagini_ref.stream()
 
     dati = []
@@ -330,11 +332,9 @@ def lista_immagini():
         item = doc.to_dict()
         item["id"] = doc.id
 
-        if query:
-            raccolte = [r.lower() for r in item.get("raccolte", [])]
-        if query not in item["id"].lower() and query not in raccolte:
+        raccolte = [r.lower() for r in item.get("raccolte", [])]
+        if query and query not in item["id"].lower() and query not in raccolte:
             continue
-
 
         dati.append(item)
 
@@ -362,6 +362,7 @@ def elimina_immagine(id):
     g.db.collection("foto_pubbliche").document(id).delete()
     return redirect(url_for("admin.lista_immagini"))
 
+
 @admin_bp.route("/immagini/update_nome", methods=["POST"])
 @admin_required
 def aggiorna_nome_immagine():
@@ -375,3 +376,49 @@ def aggiorna_nome_immagine():
         "nome": nuovo_nome
     })
     return jsonify({"success": True})
+
+
+@admin_bp.route('/servizi')
+@admin_required
+def servizi():
+    docs = g.db.collection('servizi').stream()
+    servizi = [{**doc.to_dict(), 'id': doc.id} for doc in docs]
+    return render_template('gestione_servizi.html', servizi=servizi)
+
+
+@admin_bp.route('/servizi/crea', methods=['POST'])
+@admin_required
+def crea_servizio():
+    data = request.get_json() or request.form
+    servizio = {
+        'nome': data.get('nome', '').strip(),
+        'descrizione': data.get('descrizione', '').strip(),
+        'immagine': data.get('immagine', '').strip(),
+        'costo': data.get('costo', '').strip(),
+        'durata': data.get('durata', '').strip(),
+    }
+    g.db.collection('servizi').add(servizio)
+    return jsonify({'success': True})
+
+
+@admin_bp.route('/servizi/update', methods=['POST'])
+@admin_required
+def update_servizio():
+    data = request.get_json() or request.form
+    servizio_id = data.get('id')
+    if not servizio_id:
+        return jsonify({'error': 'ID mancante'}), 400
+    update_data = {k: data.get(k) for k in ['nome', 'descrizione', 'immagine', 'costo', 'durata'] if k in data}
+    g.db.collection('servizi').document(servizio_id).update(update_data)
+    return jsonify({'success': True})
+
+
+@admin_bp.route('/servizi/elimina', methods=['POST'])
+@admin_required
+def elimina_servizio():
+    data = request.get_json() or request.form
+    servizio_id = data.get('id')
+    if not servizio_id:
+        return jsonify({'error': 'ID mancante'}), 400
+    g.db.collection('servizi').document(servizio_id).delete()
+    return jsonify({'success': True})
