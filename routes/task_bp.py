@@ -21,11 +21,11 @@ def elabora_immagine():
 
         # Get client config from central DB
         central_db = firestore.Client()
-        client_doc = central_db.collection("clienti_config").document(cliente_id).get()
-        if not client_doc.exists:
+        query = central_db.collection("clienti_config").where("cliente_id", "==", cliente_id).limit(1).get()
+        if not query:
             return jsonify({"error": "Cliente non trovato"}), 404
 
-        client_config = client_doc.to_dict()
+        client_config = query[0].to_dict()
         firestore_db_id = client_config.get("firestore_db_id")
         bucket_name = client_config.get("bucket_name")
 
