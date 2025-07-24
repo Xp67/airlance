@@ -27,9 +27,9 @@ def elabora_immagine():
 
         client_config = client_doc.to_dict()
         firestore_db_id = client_config.get("firestore_db_id")
-        bucket_name = f"foto{cliente_id}" # Or get from config if stored there
+        bucket_name = client_config.get("bucket_name")
 
-        if not firestore_db_id:
+        if not firestore_db_id or not bucket_name:
             return jsonify({"error": "Database cliente non configurato"}), 500
 
         # Initialize tenant-specific clients
