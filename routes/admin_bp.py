@@ -1,9 +1,11 @@
 from flask import Blueprint, redirect, request, session, url_for, render_template, flash, jsonify, g  # type: ignore
-from werkzeug.utils import secure_filename # type: ignore
+from werkzeug.utils import secure_filename  # type: ignore
 from google.cloud import firestore, tasks_v2, storage
 from datetime import datetime
 import json
 import os
+from io import BytesIO
+from PIL import Image
 from services.storage import firma_url
 from services.decorators import admin_required
 
@@ -399,8 +401,24 @@ def crea_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
-        blob = bucket.blob(f"servizi/{filename}")
-        blob.upload_from_file(file.stream, content_type=file.content_type)
+
+        ext = filename.rsplit('.', 1)[-1].lower()
+        file_bytes = file.read()
+        file_stream = BytesIO(file_bytes)
+
+        if ext not in ['png', 'jpg', 'jpeg']:
+            img = Image.open(file_stream).convert('RGB')
+            buffer = BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            buffer.seek(0)
+            filename = f"{os.path.splitext(filename)[0]}.jpg"
+            blob = bucket.blob(f"servizi/{filename}")
+            blob.upload_from_file(buffer, content_type='image/jpeg')
+        else:
+            file_stream.seek(0)
+            blob = bucket.blob(f"servizi/{filename}")
+            blob.upload_from_file(file_stream, content_type=file.content_type)
+
         immagine_url = blob.public_url
 
     servizio = {
@@ -432,8 +450,24 @@ def update_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
-        blob = bucket.blob(f"servizi/{filename}")
-        blob.upload_from_file(file.stream, content_type=file.content_type)
+
+        ext = filename.rsplit('.', 1)[-1].lower()
+        file_bytes = file.read()
+        file_stream = BytesIO(file_bytes)
+
+        if ext not in ['png', 'jpg', 'jpeg']:
+            img = Image.open(file_stream).convert('RGB')
+            buffer = BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            buffer.seek(0)
+            filename = f"{os.path.splitext(filename)[0]}.jpg"
+            blob = bucket.blob(f"servizi/{filename}")
+            blob.upload_from_file(buffer, content_type='image/jpeg')
+        else:
+            file_stream.seek(0)
+            blob = bucket.blob(f"servizi/{filename}")
+            blob.upload_from_file(file_stream, content_type=file.content_type)
+
         immagine_url = blob.public_url
 
     update_data = {
