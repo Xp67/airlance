@@ -1,8 +1,10 @@
+
 function apriPopupImmagine(id, nome, url) {
   document.getElementById("popup-img-id").value = id;
   document.getElementById("popup-img-nome").value = nome || "";
   document.getElementById("popup-img-download").href = url;
-  document.getElementById("form-elimina-img").action = `/admin/immagini/delete/${id}`;
+  document.getElementById("form-elimina-img").action =
+    `/admin/immagini/elimina/${id}`;
   document.getElementById("popup-immagine").classList.add("visibile");
 }
 
@@ -32,3 +34,4 @@ function salvaNomeImmagine() {
 function confermaElimina() {
   return confirm("Vuoi davvero eliminare questa immagine?");
 }
+
