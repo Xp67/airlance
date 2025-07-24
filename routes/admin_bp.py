@@ -1,13 +1,17 @@
+
 from flask import Blueprint, redirect, request, session, url_for, render_template, flash, jsonify, g  # type: ignore
-from werkzeug.utils import secure_filename  # type: ignore
+from werkzeug.utils import secure_filename # type: ignore
 from google.cloud import firestore, tasks_v2, storage
 from datetime import datetime
 import json
 import os
-from io import BytesIO
-from PIL import Image
 from services.storage import firma_url
 from services.decorators import admin_required
+import re
+import unicodedata
+from io import BytesIO
+from PIL import Image
+
 
 
 
@@ -15,6 +19,15 @@ from services.decorators import admin_required
 
 
 admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
+
+
+def clean_servizio_id(nome: str) -> str:
+    """Return a Firestore-safe document ID derived from the given name."""
+    # Normalize to ASCII and remove disallowed characters
+    normale = unicodedata.normalize('NFD', nome)
+    ascii_only = normale.encode('ascii', 'ignore').decode('ascii')
+    base = ascii_only.lower().replace(' ', '_')
+    return re.sub(r'[^a-z0-9_]+', '', base)
 
 
 @admin_bp.route("/admin_dashboard")
@@ -401,25 +414,13 @@ def crea_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
-
-        ext = filename.rsplit('.', 1)[-1].lower()
-        file_bytes = file.read()
-        file_stream = BytesIO(file_bytes)
-
-        if ext not in ['png', 'jpg', 'jpeg']:
-            img = Image.open(file_stream).convert('RGB')
-            buffer = BytesIO()
-            img.save(buffer, format='JPEG', quality=85)
-            buffer.seek(0)
-            filename = f"{os.path.splitext(filename)[0]}.jpg"
-            blob = bucket.blob(f"servizi/{filename}")
-            blob.upload_from_file(buffer, content_type='image/jpeg')
-        else:
-            file_stream.seek(0)
-            blob = bucket.blob(f"servizi/{filename}")
-            blob.upload_from_file(file_stream, content_type=file.content_type)
-
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
         immagine_url = blob.public_url
+
+    servizio_id = clean_servizio_id(nome)
+    if not servizio_id:
+        return jsonify({'error': 'Nome non valido'}), 400
 
     servizio = {
         'nome': nome,
@@ -428,8 +429,9 @@ def crea_servizio():
         'costo': costo,
         'durata': durata,
     }
-    g.db.collection('servizi').add(servizio)
-    return jsonify({'success': True})
+    g.db.collection('servizi').document(servizio_id).set(servizio)
+    return jsonify({'success': True, 'id': servizio_id})
+
 
 
 @admin_bp.route('/servizi/update', methods=['POST'])
@@ -450,25 +452,12 @@ def update_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
-
-        ext = filename.rsplit('.', 1)[-1].lower()
-        file_bytes = file.read()
-        file_stream = BytesIO(file_bytes)
-
-        if ext not in ['png', 'jpg', 'jpeg']:
-            img = Image.open(file_stream).convert('RGB')
-            buffer = BytesIO()
-            img.save(buffer, format='JPEG', quality=85)
-            buffer.seek(0)
-            filename = f"{os.path.splitext(filename)[0]}.jpg"
-            blob = bucket.blob(f"servizi/{filename}")
-            blob.upload_from_file(buffer, content_type='image/jpeg')
-        else:
-            file_stream.seek(0)
-            blob = bucket.blob(f"servizi/{filename}")
-            blob.upload_from_file(file_stream, content_type=file.content_type)
-
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
         immagine_url = blob.public_url
+
+    nuovo_id = clean_servizio_id(nome)
+
 
     update_data = {
         'nome': nome,
@@ -477,8 +466,16 @@ def update_servizio():
         'durata': durata,
         'immagine': immagine_url,
     }
-    g.db.collection('servizi').document(servizio_id).update(update_data)
-    return jsonify({'success': True})
+
+    if nuovo_id and nuovo_id != servizio_id:
+        g.db.collection('servizi').document(nuovo_id).set(update_data)
+        g.db.collection('servizi').document(servizio_id).delete()
+        servizio_id = nuovo_id
+    else:
+        g.db.collection('servizi').document(servizio_id).update(update_data)
+
+    return jsonify({'success': True, 'id': servizio_id})
+
 
 
 @admin_bp.route('/servizi/elimina', methods=['POST'])
