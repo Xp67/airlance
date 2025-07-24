@@ -28,9 +28,10 @@
       <label>Descrizione</label>
       <textarea id="servizio-descrizione" name="descrizione"></textarea>
       <label>Immagine</label>
-      <input type="text" id="servizio-immagine" name="immagine">
-      <input type="file" id="servizio-immagine-file" name="immagine_file" accept="image/*">
-      <button type="button" onclick="apriSelezionaImmagine('servizio-immagine')">Scegli da archivio</button>
+      <img id="servizio-immagine-preview" class="preview" src="/static/img/placeholder.jpg" alt="anteprima">
+      <input type="hidden" id="servizio-immagine" name="immagine">
+      <input type="file" id="servizio-immagine-file" name="immagine_file" accept="image/*" onchange="anteprimaFile(this,'servizio-immagine-preview','servizio-immagine')">
+      <button type="button" onclick="apriSelezionaImmagine('servizio-immagine','servizio-immagine-preview')">Scegli da archivio</button>
       <label>Costo</label>
       <input type="number" id="servizio-costo" name="costo" step="0.01">
       <label>Durata</label>
@@ -53,9 +54,10 @@
       <label>Descrizione</label>
       <textarea id="nuovo-descrizione" name="descrizione"></textarea>
       <label>Immagine</label>
-      <input type="text" id="nuovo-immagine" name="immagine">
-      <input type="file" id="nuovo-immagine-file" name="immagine_file" accept="image/*">
-      <button type="button" onclick="apriSelezionaImmagine('nuovo-immagine')">Scegli da archivio</button>
+      <img id="nuovo-immagine-preview" class="preview" src="/static/img/placeholder.jpg" alt="anteprima">
+      <input type="hidden" id="nuovo-immagine" name="immagine">
+      <input type="file" id="nuovo-immagine-file" name="immagine_file" accept="image/*" onchange="anteprimaFile(this,'nuovo-immagine-preview','nuovo-immagine')">
+      <button type="button" onclick="apriSelezionaImmagine('nuovo-immagine','nuovo-immagine-preview')">Scegli da archivio</button>
       <label>Costo</label>
       <input type="number" id="nuovo-costo" name="costo" step="0.01">
       <label>Durata</label>

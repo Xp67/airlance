@@ -1,5 +1,8 @@
 function apriPopupNuovoServizio() {
   const p = document.getElementById('popup-nuovo-servizio');
+  document.getElementById('form-nuovo-servizio').reset();
+  document.getElementById('nuovo-immagine').value = '';
+  document.getElementById('nuovo-immagine-preview').src = '/static/img/placeholder.jpg';
   p.classList.remove('hidden');
   p.classList.add('visibile');
 }
@@ -31,6 +34,8 @@ function apriPopupServizio(servizio) {
   document.getElementById('servizio-nome').value = servizio.nome || '';
   document.getElementById('servizio-descrizione').value = servizio.descrizione || '';
   document.getElementById('servizio-immagine').value = servizio.immagine || '';
+  document.getElementById('servizio-immagine-preview').src = servizio.immagine || '/static/img/placeholder.jpg';
+  document.getElementById('servizio-immagine-file').value = '';
   document.getElementById('servizio-costo').value = servizio.costo || '';
   document.getElementById('servizio-durata').value = servizio.durata || '';
   const p = document.getElementById('popup-servizio');
@@ -79,8 +84,8 @@ function eliminaServizio() {
 
 let campoImmagineCorrente = null;
 
-function apriSelezionaImmagine(inputId) {
-  campoImmagineCorrente = inputId;
+function apriSelezionaImmagine(inputId, previewId) {
+  campoImmagineCorrente = { inputId, previewId };
   fetch('/admin/servizi/immagini')
     .then(r => r.json())
     .then(urls => {
@@ -100,12 +105,28 @@ function apriSelezionaImmagine(inputId) {
 
 function selezionaImmagineServizio(url) {
   if (campoImmagineCorrente) {
-    document.getElementById(campoImmagineCorrente).value = url;
+    document.getElementById(campoImmagineCorrente.inputId).value = url;
+    if (campoImmagineCorrente.previewId) {
+      document.getElementById(campoImmagineCorrente.previewId).src = url;
+    }
   }
   chiudiSelezionaImmagine();
 }
 
 function chiudiSelezionaImmagine() {
   document.getElementById('popup-seleziona-immagine').classList.add('hidden');
+}
+
+function anteprimaFile(input, previewId, hiddenId) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById(previewId).src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  if (hiddenId) {
+    document.getElementById(hiddenId).value = '';
+  }
 }
 
