@@ -3,7 +3,6 @@ from werkzeug.utils import secure_filename # type: ignore
 from google.cloud import firestore, tasks_v2, storage
 from datetime import datetime
 import json
-from werkzeug.utils import secure_filename # type: ignore
 import os
 from services.storage import firma_url
 from services.decorators import admin_required
@@ -389,13 +388,27 @@ def servizi():
 @admin_bp.route('/servizi/crea', methods=['POST'])
 @admin_required
 def crea_servizio():
-    data = request.get_json() or request.form
+    nome = request.form.get('nome', '').strip()
+    descrizione = request.form.get('descrizione', '').strip()
+    costo = request.form.get('costo', '').strip()
+    durata = request.form.get('durata', '').strip()
+    immagine_url = request.form.get('immagine', '').strip()
+
+    file = request.files.get('immagine_file')
+    if file and file.filename:
+        client = storage.Client()
+        bucket = client.bucket(g.bucket_name)
+        filename = secure_filename(file.filename)
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
+        immagine_url = blob.public_url
+
     servizio = {
-        'nome': data.get('nome', '').strip(),
-        'descrizione': data.get('descrizione', '').strip(),
-        'immagine': data.get('immagine', '').strip(),
-        'costo': data.get('costo', '').strip(),
-        'durata': data.get('durata', '').strip(),
+        'nome': nome,
+        'descrizione': descrizione,
+        'immagine': immagine_url,
+        'costo': costo,
+        'durata': durata,
     }
     g.db.collection('servizi').add(servizio)
     return jsonify({'success': True})
@@ -404,11 +417,32 @@ def crea_servizio():
 @admin_bp.route('/servizi/update', methods=['POST'])
 @admin_required
 def update_servizio():
-    data = request.get_json() or request.form
-    servizio_id = data.get('id')
+    servizio_id = request.form.get('id')
     if not servizio_id:
         return jsonify({'error': 'ID mancante'}), 400
-    update_data = {k: data.get(k) for k in ['nome', 'descrizione', 'immagine', 'costo', 'durata'] if k in data}
+
+    nome = request.form.get('nome', '').strip()
+    descrizione = request.form.get('descrizione', '').strip()
+    costo = request.form.get('costo', '').strip()
+    durata = request.form.get('durata', '').strip()
+    immagine_url = request.form.get('immagine', '').strip()
+
+    file = request.files.get('immagine_file')
+    if file and file.filename:
+        client = storage.Client()
+        bucket = client.bucket(g.bucket_name)
+        filename = secure_filename(file.filename)
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
+        immagine_url = blob.public_url
+
+    update_data = {
+        'nome': nome,
+        'descrizione': descrizione,
+        'costo': costo,
+        'durata': durata,
+        'immagine': immagine_url,
+    }
     g.db.collection('servizi').document(servizio_id).update(update_data)
     return jsonify({'success': True})
 
@@ -422,3 +456,13 @@ def elimina_servizio():
         return jsonify({'error': 'ID mancante'}), 400
     g.db.collection('servizi').document(servizio_id).delete()
     return jsonify({'success': True})
+
+
+@admin_bp.route('/servizi/immagini')
+@admin_required
+def lista_immagini_servizi():
+    client = storage.Client()
+    bucket = client.bucket(g.bucket_name)
+    blobs = bucket.list_blobs(prefix='servizi/')
+    immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}' for b in blobs if not b.name.endswith('/')]
+    return jsonify(immagini)
