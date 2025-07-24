@@ -1,3 +1,4 @@
+
 from flask import Blueprint, redirect, request, session, url_for, render_template, flash, jsonify, g  # type: ignore
 from werkzeug.utils import secure_filename # type: ignore
 from google.cloud import firestore, tasks_v2, storage
@@ -8,6 +9,9 @@ from services.storage import firma_url
 from services.decorators import admin_required
 import re
 import unicodedata
+from io import BytesIO
+from PIL import Image
+
 
 
 
@@ -429,6 +433,7 @@ def crea_servizio():
     return jsonify({'success': True, 'id': servizio_id})
 
 
+
 @admin_bp.route('/servizi/update', methods=['POST'])
 @admin_required
 def update_servizio():
@@ -453,6 +458,7 @@ def update_servizio():
 
     nuovo_id = clean_servizio_id(nome)
 
+
     update_data = {
         'nome': nome,
         'descrizione': descrizione,
@@ -469,6 +475,7 @@ def update_servizio():
         g.db.collection('servizi').document(servizio_id).update(update_data)
 
     return jsonify({'success': True, 'id': servizio_id})
+
 
 
 @admin_bp.route('/servizi/elimina', methods=['POST'])
