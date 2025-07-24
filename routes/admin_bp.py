@@ -262,6 +262,7 @@ def postprocess():
     foto_id = data.get("foto_id")
     filename = data.get("filename")
 
+
     if not foto_id or not filename:
         return jsonify({"error": "Dati mancanti"}), 400
 

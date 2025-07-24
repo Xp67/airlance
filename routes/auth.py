@@ -80,7 +80,7 @@ def callback():
             "picture": userinfo["picture"],
             "roles": ruoli
         }
-       
+        return redirect("/") 
     else:
         session["user"] = {
             "email": userinfo["email"],
@@ -88,6 +88,7 @@ def callback():
             "picture": userinfo["picture"],
         }
         return redirect("/")
+
 
 @auth.route("/logout", methods=["POST"])
 def logout():
