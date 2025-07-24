@@ -20,41 +20,58 @@
 <div id="popup-servizio" class="popup hidden">
   <div class="popup-content">
     <button class="close-btn" onclick="chiudiPopupServizio()">X</button>
-    <input type="hidden" id="servizio-id">
-    <label>Nome</label>
-    <input type="text" id="servizio-nome">
-    <label>Descrizione</label>
-    <textarea id="servizio-descrizione"></textarea>
-    <label>Immagine</label>
-    <input type="text" id="servizio-immagine">
-    <label>Costo</label>
-    <input type="text" id="servizio-costo">
-    <label>Durata</label>
-    <input type="text" id="servizio-durata">
-    <div style="margin-top:1rem; display:flex; gap:1rem;">
-      <button type="button" class="btn-upload" onclick="salvaServizio()">Salva</button>
-      <button type="button" class="btn-danger" onclick="eliminaServizio()">Elimina</button>
-    </div>
+    <h2>Gestisci servizio</h2>
+    <form id="form-servizio" enctype="multipart/form-data">
+      <input type="hidden" id="servizio-id" name="id">
+      <label>Nome</label>
+      <input type="text" id="servizio-nome" name="nome">
+      <label>Descrizione</label>
+      <textarea id="servizio-descrizione" name="descrizione"></textarea>
+      <label>Immagine</label>
+      <input type="text" id="servizio-immagine" name="immagine">
+      <input type="file" id="servizio-immagine-file" name="immagine_file" accept="image/*">
+      <button type="button" onclick="apriSelezionaImmagine('servizio-immagine')">Scegli da archivio</button>
+      <label>Costo</label>
+      <input type="number" id="servizio-costo" name="costo" step="0.01">
+      <label>Durata</label>
+      <input type="text" id="servizio-durata" name="durata">
+      <div style="margin-top:1rem; display:flex; gap:1rem;">
+        <button type="button" class="btn-upload" onclick="salvaServizio()">Salva</button>
+        <button type="button" class="btn-danger" onclick="eliminaServizio()">Elimina</button>
+      </div>
+    </form>
   </div>
 </div>
 
 <div id="popup-nuovo-servizio" class="popup hidden">
   <div class="popup-content">
     <button class="close-btn" onclick="chiudiPopupNuovoServizio()">X</button>
-    <label>Nome</label>
-    <input type="text" id="nuovo-nome">
-    <label>Descrizione</label>
-    <textarea id="nuovo-descrizione"></textarea>
-    <label>Immagine</label>
-    <input type="text" id="nuovo-immagine">
-    <label>Costo</label>
-    <input type="text" id="nuovo-costo">
-    <label>Durata</label>
-    <input type="text" id="nuovo-durata">
-    <button type="button" class="btn-upload" onclick="creaServizio()">Crea</button>
+    <h2>Nuovo servizio</h2>
+    <form id="form-nuovo-servizio" enctype="multipart/form-data">
+      <label>Nome</label>
+      <input type="text" id="nuovo-nome" name="nome">
+      <label>Descrizione</label>
+      <textarea id="nuovo-descrizione" name="descrizione"></textarea>
+      <label>Immagine</label>
+      <input type="text" id="nuovo-immagine" name="immagine">
+      <input type="file" id="nuovo-immagine-file" name="immagine_file" accept="image/*">
+      <button type="button" onclick="apriSelezionaImmagine('nuovo-immagine')">Scegli da archivio</button>
+      <label>Costo</label>
+      <input type="number" id="nuovo-costo" name="costo" step="0.01">
+      <label>Durata</label>
+      <input type="text" id="nuovo-durata" name="durata">
+      <button type="button" class="btn-upload" onclick="creaServizio()">Crea</button>
+    </form>
+  </div>
+</div>
+
+<div id="popup-seleziona-immagine" class="popup hidden">
+  <div class="popup-content">
+    <button class="close-btn" onclick="chiudiSelezionaImmagine()">X</button>
+    <h3>Scegli immagine</h3>
+    <div id="lista-immagini-servizi" class="immagini-thumb"></div>
   </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/servizi.js') }}"></script>
 {% endblock %}
-

@@ -11,17 +11,11 @@ function chiudiPopupNuovoServizio() {
 }
 
 function creaServizio() {
-  const data = {
-    nome: document.getElementById('nuovo-nome').value,
-    descrizione: document.getElementById('nuovo-descrizione').value,
-    immagine: document.getElementById('nuovo-immagine').value,
-    costo: document.getElementById('nuovo-costo').value,
-    durata: document.getElementById('nuovo-durata').value
-  };
+  const form = document.getElementById('form-nuovo-servizio');
+  const data = new FormData(form);
   fetch('/admin/servizi/crea', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: data
   }).then(r => {
     if (r.ok) {
       chiudiPopupNuovoServizio();
@@ -51,18 +45,11 @@ function chiudiPopupServizio() {
 }
 
 function salvaServizio() {
-  const data = {
-    id: document.getElementById('servizio-id').value,
-    nome: document.getElementById('servizio-nome').value,
-    descrizione: document.getElementById('servizio-descrizione').value,
-    immagine: document.getElementById('servizio-immagine').value,
-    costo: document.getElementById('servizio-costo').value,
-    durata: document.getElementById('servizio-durata').value
-  };
+  const form = document.getElementById('form-servizio');
+  const data = new FormData(form);
   fetch('/admin/servizi/update', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: data
   }).then(r => {
     if (r.ok) {
       chiudiPopupServizio();
@@ -88,5 +75,37 @@ function eliminaServizio() {
       alert('Errore eliminazione');
     }
   });
+}
+
+let campoImmagineCorrente = null;
+
+function apriSelezionaImmagine(inputId) {
+  campoImmagineCorrente = inputId;
+  fetch('/admin/servizi/immagini')
+    .then(r => r.json())
+    .then(urls => {
+      const cont = document.getElementById('lista-immagini-servizi');
+      cont.innerHTML = '';
+      urls.forEach(u => {
+        const img = document.createElement('img');
+        img.src = u;
+        img.style.width = '100px';
+        img.style.cursor = 'pointer';
+        img.onclick = () => selezionaImmagineServizio(u);
+        cont.appendChild(img);
+      });
+      document.getElementById('popup-seleziona-immagine').classList.remove('hidden');
+    });
+}
+
+function selezionaImmagineServizio(url) {
+  if (campoImmagineCorrente) {
+    document.getElementById(campoImmagineCorrente).value = url;
+  }
+  chiudiSelezionaImmagine();
+}
+
+function chiudiSelezionaImmagine() {
+  document.getElementById('popup-seleziona-immagine').classList.add('hidden');
 }
 
