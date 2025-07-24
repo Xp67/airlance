@@ -47,8 +47,9 @@ async function uploadFotoFetch(inputId) {
 
   for (const file of files) {
     const ext = file.name.split(".").pop();
-    const foto_id = file.name.replace(/\.[^/.]+$/, "");
-    const filename = `${foto_id}_${Date.now()}.${ext}`;
+    const foto_id_base = file.name.replace(/\.[^/.]+$/, "");
+    const filename = `${foto_id_base}_${Date.now()}.${ext}`;
+    const foto_id = filename.replace(/\.[^/.]+$/, "");
 
     aggiornaUploadItem(filename, "🔐 Genero URL...");
 
