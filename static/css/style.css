@@ -636,3 +636,60 @@ body {
   object-fit: contain;     /* mantiene l'immagine dentro i limiti senza ritagliarla */
   padding: 8px 0;          /* un po' di spazio sopra e sotto */
 }
+
+/* ----- Gestione Servizi ----- */
+.servizi-wrapper {
+  flex-grow: 1;
+  padding: 2rem;
+  background-color: var(--colore-sfondo);
+}
+
+.servizi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.servizio-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.servizio-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.servizio-card h4 {
+  margin: 0.5rem 0;
+  color: var(--colore-primario);
+}
+
+.servizio-card p {
+  margin: 0;
+  color: var(--colore-testo-base);
+  font-size: 0.9rem;
+}
+
+.servizio-card button {
+  margin-top: 0.5rem;
+  background-color: var(--colore-primario);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+.servizio-card button:hover {
+  background-color: var(--colore-primario-hover);
+}
