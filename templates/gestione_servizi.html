@@ -1,12 +1,12 @@
 {% extends "profilo.html" %}
 
 {% block content %}
-<div class="raccolte-wrapper">
+<div class="servizi-wrapper">
   <button class="btn-upload" onclick="apriPopupNuovoServizio()">➕ Nuovo servizio</button>
   {% if servizi %}
-  <div class="raccolte-grid">
+  <div class="servizi-grid">
     {% for s in servizi %}
-    <div class="raccolta-card">
+    <div class="servizio-card">
       <img src="{{ s.immagine or '/static/img/placeholder.jpg' }}" alt="servizio">
       <h4>{{ s.nome }}</h4>
       <p>{{ s.costo }} {{ s.durata }}</p>

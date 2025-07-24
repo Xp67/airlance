@@ -1,9 +1,13 @@
 function apriPopupNuovoServizio() {
-  document.getElementById('popup-nuovo-servizio').classList.remove('hidden');
+  const p = document.getElementById('popup-nuovo-servizio');
+  p.classList.remove('hidden');
+  p.classList.add('visibile');
 }
 
 function chiudiPopupNuovoServizio() {
-  document.getElementById('popup-nuovo-servizio').classList.add('hidden');
+  const p = document.getElementById('popup-nuovo-servizio');
+  p.classList.remove('visibile');
+  p.classList.add('hidden');
 }
 
 function creaServizio() {
@@ -19,8 +23,12 @@ function creaServizio() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   }).then(r => {
-    if (r.ok) location.reload();
-    else alert('Errore creazione servizio');
+    if (r.ok) {
+      chiudiPopupNuovoServizio();
+      location.reload();
+    } else {
+      alert('Errore creazione servizio');
+    }
   });
 }
 
@@ -31,11 +39,15 @@ function apriPopupServizio(servizio) {
   document.getElementById('servizio-immagine').value = servizio.immagine || '';
   document.getElementById('servizio-costo').value = servizio.costo || '';
   document.getElementById('servizio-durata').value = servizio.durata || '';
-  document.getElementById('popup-servizio').classList.remove('hidden');
+  const p = document.getElementById('popup-servizio');
+  p.classList.remove('hidden');
+  p.classList.add('visibile');
 }
 
 function chiudiPopupServizio() {
-  document.getElementById('popup-servizio').classList.add('hidden');
+  const p = document.getElementById('popup-servizio');
+  p.classList.remove('visibile');
+  p.classList.add('hidden');
 }
 
 function salvaServizio() {
@@ -52,8 +64,12 @@ function salvaServizio() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   }).then(r => {
-    if (r.ok) location.reload();
-    else alert('Errore salvataggio');
+    if (r.ok) {
+      chiudiPopupServizio();
+      location.reload();
+    } else {
+      alert('Errore salvataggio');
+    }
   });
 }
 
@@ -65,8 +81,12 @@ function eliminaServizio() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id })
   }).then(r => {
-    if (r.ok) location.reload();
-    else alert('Errore eliminazione');
+    if (r.ok) {
+      chiudiPopupServizio();
+      location.reload();
+    } else {
+      alert('Errore eliminazione');
+    }
   });
 }
 
