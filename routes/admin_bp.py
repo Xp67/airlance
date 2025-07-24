@@ -3,10 +3,11 @@ from werkzeug.utils import secure_filename # type: ignore
 from google.cloud import firestore, tasks_v2, storage
 from datetime import datetime
 import json
-from werkzeug.utils import secure_filename # type: ignore
 import os
 from services.storage import firma_url
 from services.decorators import admin_required
+import re
+import unicodedata
 
 
 
@@ -14,6 +15,15 @@ from services.decorators import admin_required
 
 
 admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
+
+
+def clean_servizio_id(nome: str) -> str:
+    """Return a Firestore-safe document ID derived from the given name."""
+    # Normalize to ASCII and remove disallowed characters
+    normale = unicodedata.normalize('NFD', nome)
+    ascii_only = normale.encode('ascii', 'ignore').decode('ascii')
+    base = ascii_only.lower().replace(' ', '_')
+    return re.sub(r'[^a-z0-9_]+', '', base)
 
 
 @admin_bp.route("/admin_dashboard")
@@ -389,28 +399,76 @@ def servizi():
 @admin_bp.route('/servizi/crea', methods=['POST'])
 @admin_required
 def crea_servizio():
-    data = request.get_json() or request.form
+    nome = request.form.get('nome', '').strip()
+    descrizione = request.form.get('descrizione', '').strip()
+    costo = request.form.get('costo', '').strip()
+    durata = request.form.get('durata', '').strip()
+    immagine_url = request.form.get('immagine', '').strip()
+
+    file = request.files.get('immagine_file')
+    if file and file.filename:
+        client = storage.Client()
+        bucket = client.bucket(g.bucket_name)
+        filename = secure_filename(file.filename)
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
+        immagine_url = blob.public_url
+
+    servizio_id = clean_servizio_id(nome)
+    if not servizio_id:
+        return jsonify({'error': 'Nome non valido'}), 400
+
     servizio = {
-        'nome': data.get('nome', '').strip(),
-        'descrizione': data.get('descrizione', '').strip(),
-        'immagine': data.get('immagine', '').strip(),
-        'costo': data.get('costo', '').strip(),
-        'durata': data.get('durata', '').strip(),
+        'nome': nome,
+        'descrizione': descrizione,
+        'immagine': immagine_url,
+        'costo': costo,
+        'durata': durata,
     }
-    g.db.collection('servizi').add(servizio)
-    return jsonify({'success': True})
+    g.db.collection('servizi').document(servizio_id).set(servizio)
+    return jsonify({'success': True, 'id': servizio_id})
 
 
 @admin_bp.route('/servizi/update', methods=['POST'])
 @admin_required
 def update_servizio():
-    data = request.get_json() or request.form
-    servizio_id = data.get('id')
+    servizio_id = request.form.get('id')
     if not servizio_id:
         return jsonify({'error': 'ID mancante'}), 400
-    update_data = {k: data.get(k) for k in ['nome', 'descrizione', 'immagine', 'costo', 'durata'] if k in data}
-    g.db.collection('servizi').document(servizio_id).update(update_data)
-    return jsonify({'success': True})
+
+    nome = request.form.get('nome', '').strip()
+    descrizione = request.form.get('descrizione', '').strip()
+    costo = request.form.get('costo', '').strip()
+    durata = request.form.get('durata', '').strip()
+    immagine_url = request.form.get('immagine', '').strip()
+
+    file = request.files.get('immagine_file')
+    if file and file.filename:
+        client = storage.Client()
+        bucket = client.bucket(g.bucket_name)
+        filename = secure_filename(file.filename)
+        blob = bucket.blob(f"servizi/{filename}")
+        blob.upload_from_file(file.stream, content_type=file.content_type)
+        immagine_url = blob.public_url
+
+    nuovo_id = clean_servizio_id(nome)
+
+    update_data = {
+        'nome': nome,
+        'descrizione': descrizione,
+        'costo': costo,
+        'durata': durata,
+        'immagine': immagine_url,
+    }
+
+    if nuovo_id and nuovo_id != servizio_id:
+        g.db.collection('servizi').document(nuovo_id).set(update_data)
+        g.db.collection('servizi').document(servizio_id).delete()
+        servizio_id = nuovo_id
+    else:
+        g.db.collection('servizi').document(servizio_id).update(update_data)
+
+    return jsonify({'success': True, 'id': servizio_id})
 
 
 @admin_bp.route('/servizi/elimina', methods=['POST'])
@@ -422,3 +480,13 @@ def elimina_servizio():
         return jsonify({'error': 'ID mancante'}), 400
     g.db.collection('servizi').document(servizio_id).delete()
     return jsonify({'success': True})
+
+
+@admin_bp.route('/servizi/immagini')
+@admin_required
+def lista_immagini_servizi():
+    client = storage.Client()
+    bucket = client.bucket(g.bucket_name)
+    blobs = bucket.list_blobs(prefix='servizi/')
+    immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}' for b in blobs if not b.name.endswith('/')]
+    return jsonify(immagini)

@@ -693,3 +693,35 @@ body {
 .servizio-card button:hover {
   background-color: var(--colore-primario-hover);
 }
+
+/* popup forms */
+.popup-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.popup-content form input[type="text"],
+.popup-content form input[type="number"],
+.popup-content form textarea,
+.popup-content form input[type="file"] {
+  padding: 0.5rem;
+  border: 1px solid var(--colore-bordo);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.popup-content form textarea {
+  resize: vertical;
+}
+
+.popup-content img.preview {
+  width: 180px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+#lista-immagini-servizi img:hover {
+  opacity: 0.8;
+}

@@ -1,5 +1,8 @@
 function apriPopupNuovoServizio() {
   const p = document.getElementById('popup-nuovo-servizio');
+  document.getElementById('form-nuovo-servizio').reset();
+  document.getElementById('nuovo-immagine').value = '';
+  document.getElementById('nuovo-immagine-preview').src = '/static/img/placeholder.jpg';
   p.classList.remove('hidden');
   p.classList.add('visibile');
 }
@@ -11,17 +14,11 @@ function chiudiPopupNuovoServizio() {
 }
 
 function creaServizio() {
-  const data = {
-    nome: document.getElementById('nuovo-nome').value,
-    descrizione: document.getElementById('nuovo-descrizione').value,
-    immagine: document.getElementById('nuovo-immagine').value,
-    costo: document.getElementById('nuovo-costo').value,
-    durata: document.getElementById('nuovo-durata').value
-  };
+  const form = document.getElementById('form-nuovo-servizio');
+  const data = new FormData(form);
   fetch('/admin/servizi/crea', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: data
   }).then(r => {
     if (r.ok) {
       chiudiPopupNuovoServizio();
@@ -37,6 +34,8 @@ function apriPopupServizio(servizio) {
   document.getElementById('servizio-nome').value = servizio.nome || '';
   document.getElementById('servizio-descrizione').value = servizio.descrizione || '';
   document.getElementById('servizio-immagine').value = servizio.immagine || '';
+  document.getElementById('servizio-immagine-preview').src = servizio.immagine || '/static/img/placeholder.jpg';
+  document.getElementById('servizio-immagine-file').value = '';
   document.getElementById('servizio-costo').value = servizio.costo || '';
   document.getElementById('servizio-durata').value = servizio.durata || '';
   const p = document.getElementById('popup-servizio');
@@ -51,18 +50,11 @@ function chiudiPopupServizio() {
 }
 
 function salvaServizio() {
-  const data = {
-    id: document.getElementById('servizio-id').value,
-    nome: document.getElementById('servizio-nome').value,
-    descrizione: document.getElementById('servizio-descrizione').value,
-    immagine: document.getElementById('servizio-immagine').value,
-    costo: document.getElementById('servizio-costo').value,
-    durata: document.getElementById('servizio-durata').value
-  };
+  const form = document.getElementById('form-servizio');
+  const data = new FormData(form);
   fetch('/admin/servizi/update', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: data
   }).then(r => {
     if (r.ok) {
       chiudiPopupServizio();
@@ -88,5 +80,53 @@ function eliminaServizio() {
       alert('Errore eliminazione');
     }
   });
+}
+
+let campoImmagineCorrente = null;
+
+function apriSelezionaImmagine(inputId, previewId) {
+  campoImmagineCorrente = { inputId, previewId };
+  fetch('/admin/servizi/immagini')
+    .then(r => r.json())
+    .then(urls => {
+      const cont = document.getElementById('lista-immagini-servizi');
+      cont.innerHTML = '';
+      urls.forEach(u => {
+        const img = document.createElement('img');
+        img.src = u;
+        img.style.width = '100px';
+        img.style.cursor = 'pointer';
+        img.onclick = () => selezionaImmagineServizio(u);
+        cont.appendChild(img);
+      });
+      document.getElementById('popup-seleziona-immagine').classList.remove('hidden');
+    });
+}
+
+function selezionaImmagineServizio(url) {
+  if (campoImmagineCorrente) {
+    document.getElementById(campoImmagineCorrente.inputId).value = url;
+    if (campoImmagineCorrente.previewId) {
+      document.getElementById(campoImmagineCorrente.previewId).src = url;
+    }
+  }
+  chiudiSelezionaImmagine();
+}
+
+function chiudiSelezionaImmagine() {
+  document.getElementById('popup-seleziona-immagine').classList.add('hidden');
+}
+
+function anteprimaFile(input, previewId, hiddenId) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById(previewId).src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  if (hiddenId) {
+    document.getElementById(hiddenId).value = '';
+  }
 }
 
