@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify  # type: ignore
 from PIL import Image, UnidentifiedImageError  # type: ignore
 from io import BytesIO
 from google.cloud import storage, firestore
-import os
+from services.image_utils import process_image
 
 task_bp = Blueprint("task", __name__, url_prefix="/task")
 
@@ -49,28 +49,18 @@ def elabora_immagine():
         original_data = original_blob.download_as_bytes()
 
         try:
-            img = Image.open(BytesIO(original_data))
-            image = img.convert("RGB")
-            original_format = img.format
+            image, original_buffer, filename, content_type, converted = process_image(original_data, filename)
         except UnidentifiedImageError as e:
             print(f"❌ Immagine non valida: {filename} – {e}")
             return jsonify({"error": "Immagine non valida"}), 400
 
-        # Convert to JPEG if needed
-        if original_format not in ("JPEG", "PNG"):
-            print(f"⚙️ Conversione {filename} ({original_format}) in JPEG")
-            jpeg_buffer = BytesIO()
-            image.save(jpeg_buffer, format="JPEG", quality=100)
-            jpeg_buffer.seek(0)
-
-            new_filename = os.path.splitext(filename)[0] + ".jpg"
-            new_blob_path = f"foto/originals/{new_filename}"
-
-            bucket.blob(new_blob_path).upload_from_file(jpeg_buffer, content_type="image/jpeg")
+        if converted:
+            new_blob_path = f"foto/originals/{filename}"
+            bucket.blob(new_blob_path).upload_from_file(original_buffer, content_type=content_type)
             original_blob.delete()
-
-            filename = new_filename
             blob_path = new_blob_path
+        else:
+            original_buffer.close()
 
         # Create versions
         thumb = resize_image(image, 300)
