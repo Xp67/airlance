@@ -1,6 +1,5 @@
-
 from flask import Blueprint, redirect, request, session, url_for, render_template, flash, jsonify, g  # type: ignore
-from werkzeug.utils import secure_filename # type: ignore
+from werkzeug.utils import secure_filename  # type: ignore
 from google.cloud import firestore, tasks_v2, storage
 from datetime import datetime
 import json
@@ -9,8 +8,7 @@ from services.storage import firma_url
 from services.decorators import admin_required
 import re
 import unicodedata
-from io import BytesIO
-from PIL import Image
+from services.image_utils import process_image
 
 
 
@@ -414,8 +412,10 @@ def crea_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
+        file_bytes = file.read()
+        _, buffer, filename, content_type, _ = process_image(file_bytes, filename)
         blob = bucket.blob(f"servizi/{filename}")
-        blob.upload_from_file(file.stream, content_type=file.content_type)
+        blob.upload_from_file(buffer, content_type=content_type)
         immagine_url = blob.public_url
 
     servizio_id = clean_servizio_id(nome)
@@ -452,9 +452,15 @@ def update_servizio():
         client = storage.Client()
         bucket = client.bucket(g.bucket_name)
         filename = secure_filename(file.filename)
+        file_bytes = file.read()
+        _, buffer, filename, content_type, _ = process_image(file_bytes, filename)
         blob = bucket.blob(f"servizi/{filename}")
-        blob.upload_from_file(file.stream, content_type=file.content_type)
+        blob.upload_from_file(buffer, content_type=content_type)
         immagine_url = blob.public_url
+    elif not immagine_url:
+        doc = g.db.collection('servizi').document(servizio_id).get()
+        if doc.exists:
+            immagine_url = doc.to_dict().get('immagine', '')
 
     nuovo_id = clean_servizio_id(nome)
 
