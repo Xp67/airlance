@@ -79,11 +79,13 @@ function apriPopupSelezione() {
         console.error("Risposta inattesa dal server:", data);
         throw new Error("Formato dati non valido");
       }
+
       immaginiDisponibili = data;
       const container = document.getElementById("tutte-le-immagini");
       container.innerHTML = "";
       data.forEach(img => {
         const div = document.createElement("div");
+
         div.innerHTML = `
           <label style="display: block; text-align: center;">
             <img src="${img.thumb}" style="width: 100px; border-radius: 6px;"><br>
@@ -91,12 +93,12 @@ function apriPopupSelezione() {
           </label>`;
         container.appendChild(div);
       });
-
       document.getElementById("popup-selezione-immagini").classList.remove("hidden");
     })
     .catch(err => {
       console.error("Errore nel caricamento delle immagini:", err);
       alert(`Errore nel caricamento delle immagini: ${err.message}`);
+
     });
 }
 
