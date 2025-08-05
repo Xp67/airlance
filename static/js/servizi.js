@@ -15,18 +15,7 @@ function chiudiPopupNuovoServizio() {
 
 function creaServizio() {
   const form = document.getElementById('form-nuovo-servizio');
-  const data = new FormData(form);
-  fetch('/admin/servizi/crea', {
-    method: 'POST',
-    body: data
-  }).then(r => {
-    if (r.ok) {
-      chiudiPopupNuovoServizio();
-      location.reload();
-    } else {
-      alert('Errore creazione servizio');
-    }
-  });
+  convertAndSubmit(form, '/admin/servizi/crea');
 }
 
 function apriPopupServizio(servizio) {
@@ -51,18 +40,7 @@ function chiudiPopupServizio() {
 
 function salvaServizio() {
   const form = document.getElementById('form-servizio');
-  const data = new FormData(form);
-  fetch('/admin/servizi/update', {
-    method: 'POST',
-    body: data
-  }).then(r => {
-    if (r.ok) {
-      chiudiPopupServizio();
-      location.reload();
-    } else {
-      alert('Errore salvataggio');
-    }
-  });
+  convertAndSubmit(form, '/admin/servizi/update');
 }
 
 function eliminaServizio() {
@@ -130,3 +108,66 @@ function anteprimaFile(input, previewId, hiddenId) {
   }
 }
 
+async function convertImageToJpeg(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpeg"), {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(newFile);
+          } else {
+            reject(new Error('Canvas to Blob conversion failed'));
+          }
+        }, 'image/jpeg', 0.95);
+      };
+      img.onerror = reject;
+      img.src = event.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function convertAndSubmit(form, url) {
+  const formData = new FormData(form);
+  const fileInput = form.querySelector('input[type="file"]');
+  const file = fileInput.files[0];
+
+  if (file) {
+    const allowedExtensions = ['jpg', 'jpeg', 'png'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      try {
+        const convertedFile = await convertImageToJpeg(file);
+        formData.set(fileInput.name, convertedFile);
+      } catch (error) {
+        console.error('Error converting image:', error);
+        alert('Errore durante la conversione dell\'immagine.');
+        return;
+      }
+    }
+  }
+
+  fetch(url, {
+    method: 'POST',
+    body: formData
+  }).then(r => {
+    if (r.ok) {
+      location.reload();
+    } else {
+      alert('Errore durante il salvataggio.');
+    }
+  });
+}
