@@ -17,7 +17,7 @@ import logging
 
 
 
-admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
+admin_bp = Blueprint('admin', __name__)
 logger = logging.getLogger(__name__)
 
 
