@@ -230,3 +230,6 @@ function rimuoviImmagineDaRaccolta(id) {
 }
 
 
+document.getElementById('nuova-raccolta-btn')
+  .addEventListener('click', apriPopupCreazione);
+
