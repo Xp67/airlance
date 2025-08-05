@@ -44,7 +44,20 @@ let immaginiDisponibili = [];
 let immaginiSelezionate = [];
 
 function apriPopupCreazione() {
-  document.getElementById("popup-nuova-raccolta").classList.remove("hidden");
+  const popup = document.getElementById("popup-nuova-raccolta");
+  popup.classList.add("visibile");
+  popup.classList.remove("hidden");
+
+  console.log("Popup nuova raccolta aperto");
+  const triggerBtn = document.querySelector(".nuova-raccolta-btn");
+  if (triggerBtn) {
+    const originalText = triggerBtn.textContent;
+    triggerBtn.textContent = "Caricamento...";
+    setTimeout(() => {
+      triggerBtn.textContent = originalText;
+    }, 1000);
+  }
+
   immaginiSelezionate = [];
   document.getElementById("preview-immagini-scelte").innerHTML = "";
 }
