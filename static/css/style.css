@@ -445,6 +445,8 @@ body {
   max-width: 800px;
   width: 100%;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .popup-header {
