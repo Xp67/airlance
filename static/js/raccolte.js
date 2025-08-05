@@ -68,7 +68,12 @@ function chiudiPopupCreazione() {
 
 function apriPopupSelezione() {
   fetch('/admin/immagini/tutte')
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Errore HTTP ${res.status}`);
+      }
+      return res.json();
+    })
     .then(data => {
       immaginiDisponibili = data;
       const container = document.getElementById("tutte-le-immagini");
@@ -84,6 +89,10 @@ function apriPopupSelezione() {
       });
 
       document.getElementById("popup-selezione-immagini").classList.remove("hidden");
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento delle immagini:", err);
+      alert("Errore nel caricamento delle immagini.");
     });
 }
 
