@@ -116,8 +116,14 @@ function salvaNuovaRaccolta() {
       if (res.ok) {
         location.reload(); // ricarica per vedere la nuova raccolta
       } else {
-        alert("Errore nella creazione della raccolta.");
+        res.text().then(msg => {
+          alert(`Errore nella creazione della raccolta: ${msg}`);
+        });
       }
+    })
+    .catch(err => {
+      console.error("Errore creazione raccolta", err);
+      alert(`Errore creazione raccolta: ${err.message}`);
     });
 }
 
