@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="servizi-wrapper">
+    <h2 class="titolo-sezione">I Nostri Servizi</h2>
+    <div class="servizi-grid">
+        {% for servizio in servizi %}
+        <div class="servizio-card">
+            <img src="{{ servizio.immagine if servizio.immagine else 'https://via.placeholder.com/300x200' }}" alt="{{ servizio.nome }}">
+            <h4>{{ servizio.nome }}</h4>
+            <p>{{ servizio.descrizione }}</p>
+            <button>Dettagli</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
