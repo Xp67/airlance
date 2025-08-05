@@ -6,6 +6,7 @@ from routes.auth import auth
 from routes.user_bp import user_bp
 from routes.admin_bp import admin_bp
 from routes.task_bp import task_bp
+from routes.public_bp import public_bp
 import json
 from jinja2 import ChoiceLoader, FileSystemLoader # type: ignore
 import os
@@ -139,6 +140,7 @@ app.register_blueprint(auth)
 app.register_blueprint(user_bp, url_prefix="/user")
 app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(task_bp, url_prefix="/task")
+app.register_blueprint(public_bp)
 
 
 @app.before_request

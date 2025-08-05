@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="raccolte-wrapper">
+    <h2 class="titolo-sezione">Le Nostre Raccolte</h2>
+    <div class="raccolte-grid">
+        {% for raccolta in raccolte %}
+            <div class="raccolta-card" onclick='openCollectionPopup({{ raccolta.immagini|tojson }}, "{{ raccolta.nome }}")'>
+                <img src="{{ raccolta.copertina or 'https://via.placeholder.com/300x200' }}" alt="Copertina {{ raccolta.nome }}">
+                <h4>{{ raccolta.nome }}</h4>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="titolo-sezione" style="margin-top: 4rem;">Galleria</h2>
+    <div class="portfolio-grid">
+        {% for image in images %}
+            <div class="portfolio-item">
+                <img src="{{ image.web or image.thumb or image.original }}" alt="Immagine Portfolio">
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="collection-popup" class="popup hidden">
+    <div class="popup-content">
+        <button class="close-btn" onclick="closeCollectionPopup()">X</button>
+        <h2 id="popup-collection-name"></h2>
+        <div id="popup-images-grid" class="portfolio-grid"></div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+{% endblock %}
