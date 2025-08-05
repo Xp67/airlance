@@ -9,6 +9,7 @@ from services.decorators import admin_required
 import re
 import unicodedata
 from services.image_utils import process_image
+import logging
 
 
 
@@ -17,6 +18,7 @@ from services.image_utils import process_image
 
 
 admin_bp = Blueprint('admin', __name__,url_prefix='/admin')
+logger = logging.getLogger(__name__)
 
 
 def clean_servizio_id(nome: str) -> str:
@@ -85,44 +87,54 @@ def tutte_immagini():
 @admin_required
 def crea_raccolta_post():
     data = request.get_json()
-    print("📥 JSON ricevuto:", data)
+    logger.debug("📥 JSON ricevuto: %s", data)
+
+    if not data:
+        logger.warning("Richiesta senza corpo JSON")
+        return jsonify({"error": "Dati mancanti"}), 400
 
     nome = data.get("nome", "").strip()
-    id_raccolta = nome.lower().replace(" ", "_") 
+    id_raccolta = nome.lower().replace(" ", "_")
     descrizione = data.get("descrizione", "").strip()
     immagini_ids = data.get("immagini", [])
 
     if not nome or not immagini_ids:
+        logger.warning("Campi mancanti nella creazione della raccolta: nome=%s, immagini=%s", nome, immagini_ids)
         return jsonify({"error": "Nome e immagini obbligatori"}), 400
 
     # recupera la prima immagine per usarla come copertina
     copertina_url = None
     primo_id = immagini_ids[0]
-    primo_doc = g.db.collection("foto_pubbliche").document(primo_id).get()
+    try:
+        primo_doc = g.db.collection("foto_pubbliche").document(primo_id).get()
+    except Exception:
+        logger.exception("Errore Firestore durante il recupero dell'immagine '%s'", primo_id)
+        return jsonify({"error": "Errore durante il recupero della copertina"}), 500
+
     if primo_doc.exists:
         primo_data = primo_doc.to_dict()
         copertina_url = primo_data.get("thumb")
     else:
-        print(f"⚠️ Documento immagine '{primo_id}' non trovato su Firestore")
+        logger.warning("Documento immagine '%s' non trovato su Firestore", primo_id)
         return jsonify({"error": f"Immagine '{primo_id}' non trovata"}), 400
 
-
-    raccolta_ref = g.db.collection("raccolte").document(id_raccolta)
-    raccolta_ref.set({
-        "nome": nome,
-        "descrizione": descrizione,
-        "copertina": copertina_url,
-        "immagini": immagini_ids,
-        "timestamp": firestore.SERVER_TIMESTAMP
-    })
-
-    # aggiorna ogni immagine con il campo raccolte[]
-    for img_id in immagini_ids:
-        img_ref = g.db.collection("foto_pubbliche").document(img_id)
-        img_ref.update({
-            "raccolte": firestore.ArrayUnion([id_raccolta])
-
+    try:
+        raccolta_ref = g.db.collection("raccolte").document(id_raccolta)
+        raccolta_ref.set({
+            "nome": nome,
+            "descrizione": descrizione,
+            "copertina": copertina_url,
+            "immagini": immagini_ids,
+            "timestamp": firestore.SERVER_TIMESTAMP
         })
+
+        # aggiorna ogni immagine con il campo raccolte[]
+        for img_id in immagini_ids:
+            img_ref = g.db.collection("foto_pubbliche").document(img_id)
+            img_ref.update({"raccolte": firestore.ArrayUnion([id_raccolta])})
+    except Exception:
+        logger.exception("Errore Firestore durante la creazione della raccolta '%s'", id_raccolta)
+        return jsonify({"error": "Errore durante il salvataggio della raccolta"}), 500
 
     return jsonify({"success": True}), 200
 
