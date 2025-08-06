@@ -1,0 +1,12 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+<h2>Richieste Servizi</h2>
+<ul>
+  {% for r in richieste %}
+  <li>{{ r.data_ora }} - {{ r.cliente_id }} - {{ r.servizi|join(', ') }}</li>
+  {% else %}
+  <li>Nessuna richiesta</li>
+  {% endfor %}
+</ul>
+{% endblock %}

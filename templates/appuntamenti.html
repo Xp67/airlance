@@ -1,22 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Appuntamenti</h2>
-<ul id="lista-appuntamenti">
-  {% for a in appuntamenti %}
-  <li>{{ a.data_ora }} - {{ a.stato }}</li>
-  {% endfor %}
-</ul>
 
+<h2>Prenota Servizi</h2>
 <form id="nuovo-appuntamento">
-  <input type="text" name="freelancer_id" placeholder="Freelancer ID" required>
-  <input type="text" name="cliente_id" placeholder="Cliente ID" required>
-  <input type="datetime-local" name="data_ora" required>
-  <select name="stato">
-    <option value="previsto">Previsto</option>
-    <option value="completato">Completato</option>
-  </select>
-  <button type="submit">Crea</button>
+  <div id="lista-servizi">
+    {% for s in servizi %}
+    <div class="servizio-card">
+      <h4>{{ s.nome }}</h4>
+      <p>{{ s.descrizione }}</p>
+      <button type="button" class="add-servizio" data-id="{{ s.id }}" data-nome="{{ s.nome }}">Aggiungi</button>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h3>Carrello</h3>
+  <ul id="carrello"></ul>
+
+  <div id="seleziona-slot" class="hidden">
+    <label for="data_ora">Scegli giorno e ora:</label>
+    <select id="data_ora" name="data_ora">
+      {% for d in disponibilita %}
+      <option value="{{ d.data_ora }}">{{ d.data_ora }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <input type="text" name="freelancer_id" id="freelancer_id" placeholder="Freelancer ID" required>
+  <input type="text" name="cliente_id" id="cliente_id" placeholder="Cliente ID" required>
+  <button type="submit" id="invio-richiesta">Invia Richiesta</button>
+
 </form>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/appuntamenti.css') }}">
 <script src="{{ url_for('static', filename='js/appuntamenti.js') }}"></script>
