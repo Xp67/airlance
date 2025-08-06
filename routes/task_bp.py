@@ -3,8 +3,10 @@ from PIL import Image, UnidentifiedImageError  # type: ignore
 from io import BytesIO
 from google.cloud import storage, firestore
 from services.image_utils import process_image
+import logging
 
 task_bp = Blueprint("task", __name__, url_prefix="/task")
+logger = logging.getLogger(__name__)
 
 @task_bp.route("/elabora-immagine", methods=["POST"])
 def elabora_immagine():
@@ -15,10 +17,10 @@ def elabora_immagine():
         cliente_id = data.get("cliente_id")
 
         if not foto_id or not filename or not cliente_id:
-            print("❌ Task ricevuto senza foto_id, filename, o cliente_id")
+            logger.warning("❌ Task ricevuto senza foto_id, filename, o cliente_id")
             return jsonify({"error": "Dati mancanti"}), 400
 
-        print(f"📥 Task ricevuto: {cliente_id} - {foto_id} - {filename}")
+        logger.info("📥 Task ricevuto: %s - %s - %s", cliente_id, foto_id, filename)
 
         # Get client config from central DB
         central_db = firestore.Client()
@@ -43,7 +45,7 @@ def elabora_immagine():
         original_blob = bucket.blob(blob_path)
 
         if not original_blob.exists():
-            print(f"❌ File non trovato su GCS: {blob_path}")
+            logger.warning("❌ File non trovato su GCS: %s", blob_path)
             return jsonify({"error": "File non trovato"}), 404
 
         original_data = original_blob.download_as_bytes()
@@ -51,7 +53,7 @@ def elabora_immagine():
         try:
             image, original_buffer, filename, content_type, converted = process_image(original_data, filename)
         except UnidentifiedImageError as e:
-            print(f"❌ Immagine non valida: {filename} – {e}")
+            logger.error("❌ Immagine non valida: %s – %s", filename, e)
             return jsonify({"error": "Immagine non valida"}), 400
 
         if converted:
@@ -73,7 +75,7 @@ def elabora_immagine():
         bucket.blob(thumb_path).upload_from_file(thumb, content_type="image/jpeg")
         bucket.blob(web_path).upload_from_file(web, content_type="image/jpeg")
 
-        print(f"📤 Versioni caricate: {thumb_path}, {web_path}")
+        logger.info("📤 Versioni caricate: %s, %s", thumb_path, web_path)
 
         # Public links
         base_url = f"https://storage.googleapis.com/{bucket_name}"
@@ -89,11 +91,11 @@ def elabora_immagine():
             "timestamp": firestore.SERVER_TIMESTAMP
         }, merge=True)
 
-        print(f"✅ Firestore aggiornato per {foto_id}")
+        logger.info("✅ Firestore aggiornato per %s", foto_id)
         return jsonify({"success": True})
 
     except Exception as e:
-        print("❌ Errore nel task /elabora-immagine:", e)
+        logger.error("❌ Errore nel task /elabora-immagine: %s", e)
         return jsonify({"error": "Errore interno"}), 500
 
 

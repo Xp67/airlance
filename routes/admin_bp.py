@@ -201,10 +201,10 @@ def aggiorna_raccolta():
     immagini_ids = request.form.getlist("immagini[]")
     file = request.files.get("copertina")
 
-    print("📥 ID raccolta originale:", id_vecchio)
-    print("📥 Nuovo nome:", nome_nuovo)
-    print("📥 Immagini ricevute:", immagini_ids)
-    print("📥 File copertina:", "presente" if file else "nessuno")
+    logger.info("📥 ID raccolta originale: %s", id_vecchio)
+    logger.info("📥 Nuovo nome: %s", nome_nuovo)
+    logger.info("📥 Immagini ricevute: %s", immagini_ids)
+    logger.info("📥 File copertina: %s", "presente" if file else "nessuno")
 
     if not id_vecchio or not nome_nuovo:
         return jsonify({"error": "ID o nome mancanti"}), 400
@@ -237,12 +237,12 @@ def aggiorna_raccolta():
     }
 
     raccolta_ref_nuova.set(data)
-    print(f"✅ Raccolta salvata con ID: {id_nuovo}")
-    print(f"✅ Immagini nella raccolta: {immagini_ids}")
+    logger.info("✅ Raccolta salvata con ID: %s", id_nuovo)
+    logger.info("✅ Immagini nella raccolta: %s", immagini_ids)
 
     # Se il nome è cambiato, elimina la vecchia raccolta
     if id_vecchio != id_nuovo:
-        print(f"🧹 Eliminazione raccolta precedente: {id_vecchio}")
+        logger.info("🧹 Eliminazione raccolta precedente: %s", id_vecchio)
         g.db.collection("raccolte").document(id_vecchio).delete()
 
     # 🔁 Aggiorna riferimenti raccolta nelle immagini
@@ -268,7 +268,7 @@ def aggiorna_raccolta():
             g.db.collection("foto_pubbliche").document(foto_id).update({
                 "raccolte": raccolte_attuali
             })
-            print(f"✅ Immagine {foto_id} aggiornata → raccolte: {raccolte_attuali}")
+            logger.info("✅ Immagine %s aggiornata → raccolte: %s", foto_id, raccolte_attuali)
 
 
     return jsonify({
@@ -336,7 +336,7 @@ def signed_upload_url():
         public_url = f"https://storage.googleapis.com/{g.bucket_name}/{blob_path}"
         return jsonify({"url": url, "public_url": public_url})
     except Exception as e:
-        print("❌ Errore generazione signed URL:", e)
+        logger.error("❌ Errore generazione signed URL: %s", e)
         return jsonify({"error": "errore generazione signed URL"}), 500
     
 @admin_bp.route("/immagini", endpoint="lista_immagini")
