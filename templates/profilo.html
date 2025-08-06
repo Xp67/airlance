@@ -20,8 +20,18 @@
       <th>Email</th>
       <td>{{ user.email }}</td>
     </tr>
-    
+
   </table>
+
+  <form method="post" action="{{ url_for('user.profilo') }}" enctype="multipart/form-data" class="user-form">
+    <label for="nome">Nome</label>
+    <input type="text" id="nome" name="nome" value="{{ user.name }}" required>
+
+    <label for="immagine">Immagine profilo</label>
+    <input type="file" id="immagine" name="immagine" accept="image/*">
+
+    <button type="submit">Aggiorna</button>
+  </form>
 </div>
 
 {% endblock %}
