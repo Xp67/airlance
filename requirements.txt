@@ -11,3 +11,4 @@ pillow
 google-cloud-tasks
 google-cloud-secret-manager
 google-cloud-logging
+google-api-python-client

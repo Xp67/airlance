@@ -515,3 +515,16 @@ def lista_immagini_servizi():
     blobs = bucket.list_blobs(prefix='servizi/')
     immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}' for b in blobs if not b.name.endswith('/')]
     return jsonify(immagini)
+
+
+@admin_bp.route('/richieste-servizi')
+@admin_required
+def richieste_servizi():
+    docs = (
+        g.db.collection('appuntamenti')
+        .where('stato', '==', 'richiesta')
+        .order_by('data_ora')
+        .stream()
+    )
+    richieste = [{**doc.to_dict(), 'id': doc.id} for doc in docs]
+    return render_template('richieste_servizi.html', richieste=richieste)

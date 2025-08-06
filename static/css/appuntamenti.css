@@ -1,0 +1,21 @@
+#lista-servizi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.servizio-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  width: 200px;
+}
+
+#carrello {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+#seleziona-slot.hidden {
+  display: none;
+}
