@@ -100,6 +100,7 @@ function apriPopupSelezione() {
     });
 }
 
+
 function chiudiPopupSelezione() {
   document.getElementById("popup-selezione-immagini").classList.add("hidden");
 }

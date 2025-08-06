@@ -1,5 +1,5 @@
 
-from flask import Flask, session, request, render_template, g, send_from_directory, url_for # type: ignore
+from flask import Flask, session, request, render_template, g, send_from_directory, url_for  # type: ignore
 import config
 from google.cloud import firestore, storage
 from routes.auth import auth
@@ -7,13 +7,24 @@ from routes.user_bp import user_bp
 from routes.admin_bp import admin_bp
 from routes.task_bp import task_bp
 from routes.public_bp import public_bp
+from routes.schedule_bp import schedule_bp
 import json
-from jinja2 import ChoiceLoader, FileSystemLoader # type: ignore
+from jinja2 import ChoiceLoader, FileSystemLoader  # type: ignore
 import os
+import logging
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+numeric_level = getattr(logging, LOG_LEVEL, logging.INFO)
+logging.basicConfig(level=numeric_level)
+logger = logging.getLogger(__name__)
 
+if os.getenv("ENABLE_GOOGLE_CLOUD_LOGGING", "").lower() == "true":
+    try:
+        import google.cloud.logging
 
-
+        google.cloud.logging.Client().setup_logging(log_level=numeric_level)
+    except Exception as e:
+        logger.warning("Impossibile configurare Google Cloud Logging: %s", e)
 def carica_cliente():
     dominio = request.host.split(":")[0].lower().replace("www.", "").strip()
     db_centrale = firestore.Client()
@@ -56,7 +67,7 @@ def inizializza_dati_cliente(db):
     config_doc = config_ref.get()
 
     if not config_doc.exists or not config_doc.to_dict().get("roles_initialized"):
-        print(f"✨ Inizializzazione dati per il database...")
+        logger.info("✨ Inizializzazione dati per il database...")
         db.collection("roles").document("admin").set({"nome": "Amministratore"})
         db.collection("roles").document("user").set({"nome": "Utente"})
 
@@ -71,15 +82,15 @@ def inizializza_dati_cliente(db):
                 "nome": "Marco",
                 "ruoli": ["admin"]
             })
-            print(f"✅ Creato utente admin: {admin_email}")
+            logger.info("✅ Creato utente admin: %s", admin_email)
         else:
             admin_ref.update({
                 "ruoli": firestore.ArrayUnion(["admin"])
             })
-            print(f"✅ Assicurato ruolo admin per: {admin_email}")
+            logger.info("✅ Assicurato ruolo admin per: %s", admin_email)
 
         config_ref.set({"roles_initialized": True}, merge=True)
-        print("✅ Inizializzazione completata.")
+        logger.info("✅ Inizializzazione completata.")
 
     # Inizializza collezione servizi se assente
     if not any(db.collection("servizi").limit(1).stream()):
@@ -90,9 +101,9 @@ def inizializza_dati_cliente(db):
             "costo": "",
             "durata": ""
         })
-        print("✅ Collezione 'servizi' inizializzata")
+        logger.info("✅ Collezione 'servizi' inizializzata")
 def verifica_bucket_clienti():
-    print("🚀 Avvio verifica bucket per tutti i clienti...")
+    logger.info("🚀 Avvio verifica bucket per tutti i clienti...")
     client_storage = storage.Client()
     client_firestore = firestore.Client()
 
@@ -104,29 +115,29 @@ def verifica_bucket_clienti():
         firestore_db_id = data.get("firestore_db_id")
 
         if not cliente_id or not firestore_db_id:
-            print(f"⚠️ Cliente senza ID o progetto Firestore: {data}")
+            logger.warning("⚠️ Cliente senza ID o progetto Firestore: %s", data)
             continue
 
         bucket_name = f"foto{cliente_id}"
 
         # Verifica se il bucket esiste
         if not client_storage.lookup_bucket(bucket_name):
-            print(f"🆕 Creo bucket: {bucket_name}")
+            logger.info("🆕 Creo bucket: %s", bucket_name)
             bucket = client_storage.bucket(bucket_name)
             bucket.location = "europe-west6"
             client_storage.create_bucket(bucket)
-            print(f"✅ Bucket creato: {bucket_name}")
+            logger.info("✅ Bucket creato: %s", bucket_name)
         else:
-            print(f"✅ Bucket già presente: {bucket_name}")
+            logger.info("✅ Bucket già presente: %s", bucket_name)
 
         # 🔁 Salva bucket_name nel Firestore del cliente (config > info)
         try:
             db_cliente = firestore.Client(database=firestore_db_id)
             config_ref = db_cliente.collection("config").document("info")
             config_ref.set({"bucket_name": bucket_name}, merge=True)
-            print(f"📌 Aggiornato campo bucket_name per {cliente_id} in {firestore_db_id}")
+            logger.info("📌 Aggiornato campo bucket_name per %s in %s", cliente_id, firestore_db_id)
         except Exception as e:
-            print(f"❌ Errore aggiornando config/info per {cliente_id}: {e}")
+            logger.error("❌ Errore aggiornando config/info per %s: %s", cliente_id, e)
             
 def file_cliente_esiste(cliente_id, path_locale):
     return os.path.exists(os.path.join("clienti", cliente_id, "static", path_locale))
@@ -140,6 +151,7 @@ app.register_blueprint(auth)
 app.register_blueprint(user_bp, url_prefix="/user")
 app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(task_bp, url_prefix="/task")
+app.register_blueprint(schedule_bp)
 app.register_blueprint(public_bp)
 
 
@@ -191,9 +203,9 @@ def inject_globals():
     else:
         logo_url = url_for("static", filename=logo_path)
         
-    print("🧪 g.cliente_id =", getattr(g, "cliente_id", "N/A"))
-    print("🧪 config_ui =", config_ui)
-    print("🧪 titolo_sito =", titolo_sito)
+    logger.debug("🧪 g.cliente_id = %s", getattr(g, "cliente_id", "N/A"))
+    logger.debug("🧪 config_ui = %s", config_ui)
+    logger.debug("🧪 titolo_sito = %s", titolo_sito)
     return {
         "FAVICON_URL": favicon_url,
         "LOGO_URL": logo_url,

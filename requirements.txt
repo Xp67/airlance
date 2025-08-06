@@ -10,3 +10,5 @@ python-dateutil>=2.8.0
 pillow
 google-cloud-tasks
 google-cloud-secret-manager
+google-cloud-logging
+google-api-python-client
