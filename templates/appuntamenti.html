@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Appuntamenti</h2>
+<ul id="lista-appuntamenti">
+  {% for a in appuntamenti %}
+  <li>{{ a.data_ora }} - {{ a.stato }}</li>
+  {% endfor %}
+</ul>
+
+<form id="nuovo-appuntamento">
+  <input type="text" name="freelancer_id" placeholder="Freelancer ID" required>
+  <input type="text" name="cliente_id" placeholder="Cliente ID" required>
+  <input type="datetime-local" name="data_ora" required>
+  <select name="stato">
+    <option value="previsto">Previsto</option>
+    <option value="completato">Completato</option>
+  </select>
+  <button type="submit">Crea</button>
+</form>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/appuntamenti.css') }}">
+<script src="{{ url_for('static', filename='js/appuntamenti.js') }}"></script>
+{% endblock %}

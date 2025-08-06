@@ -1,0 +1,16 @@
+#lista-appuntamenti {
+  list-style: none;
+  padding: 0;
+}
+
+#lista-appuntamenti li {
+  margin-bottom: 0.5rem;
+}
+
+#nuovo-appuntamento {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 300px;
+}
