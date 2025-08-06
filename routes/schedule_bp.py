@@ -44,6 +44,7 @@ def crea_appuntamento():
                 "end": {"dateTime": data["data_ora"]},
             },
         )
+
     except Exception as e:  # pragma: no cover - log but do not fail
         logger.warning("Impossibile sincronizzare evento calendario: %s", e)
 

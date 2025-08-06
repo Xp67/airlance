@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h2>Prenota Servizi</h2>
 <form id="nuovo-appuntamento">
   <div id="lista-servizi">
@@ -28,6 +29,7 @@
   <input type="text" name="freelancer_id" id="freelancer_id" placeholder="Freelancer ID" required>
   <input type="text" name="cliente_id" id="cliente_id" placeholder="Cliente ID" required>
   <button type="submit" id="invio-richiesta">Invia Richiesta</button>
+
 </form>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/appuntamenti.css') }}">
 <script src="{{ url_for('static', filename='js/appuntamenti.js') }}"></script>
