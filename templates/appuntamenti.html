@@ -7,15 +7,13 @@
   <div id="lista-servizi">
     {% for s in servizi %}
     <div class="servizio-card">
-      <h4>{{ s.nome }}</h4>
-      <p>{{ s.descrizione }}</p>
+      <img src="{{ s.immagine if s.immagine else 'https://via.placeholder.com/300x200' }}" alt="{{ s.nome }}">
+      <h4 class="servizio-titolo">{{ s.nome }}</h4>
+      <p class="servizio-descrizione">{{ s.descrizione }}</p>
       <button type="button" class="add-servizio" data-id="{{ s.id }}" data-nome="{{ s.nome }}">Aggiungi</button>
     </div>
     {% endfor %}
   </div>
-
-  <h3>Carrello</h3>
-  <ul id="carrello"></ul>
 
   <div id="seleziona-slot" class="hidden">
     <label for="data_ora">Scegli giorno e ora:</label>
@@ -26,9 +24,11 @@
     </select>
   </div>
 
-  <input type="text" name="freelancer_id" id="freelancer_id" placeholder="Freelancer ID" required>
-  <input type="text" name="cliente_id" id="cliente_id" placeholder="Cliente ID" required>
-  <button type="submit" id="invio-richiesta">Invia Richiesta</button>
+  <div id="carrello-container">
+    <h3>Carrello</h3>
+    <ul id="carrello"></ul>
+    <button type="button" id="procedi-richiesta">Procedi con la richiesta</button>
+  </div>
 
 </form>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/appuntamenti.css') }}">
