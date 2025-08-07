@@ -1,13 +1,14 @@
+/* Lista servizi */
 #lista-servizi {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .servizio-card {
   position: relative;
-  width: 250px;
-  height: 180px;
+  width: 300px;
+  height: 225px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -21,7 +22,7 @@
 
 .servizio-titolo {
   position: absolute;
-  top: 80%;
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
@@ -29,6 +30,8 @@
   text-align: center;
   transition: all 0.3s ease;
   width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.2rem 0.5rem;
 }
 
 .servizio-descrizione {
@@ -55,25 +58,44 @@
 .servizio-card:hover .servizio-titolo {
   top: 20%;
   transform: translate(-50%, -50%) scale(0.8);
+  background: none;
 }
 
 .servizio-card .add-servizio {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 2;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
+.servizio-card .add-servizio:hover {
+  background: #0056b3;
+}
+
+/* Contenitore carrello */
 #carrello-container {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #f9f9f9;
+  border: 2px solid #007bff;
+  border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: none;
   z-index: 10;
+}
+#carrello-container h3 {
+  margin-top: 0;
+  color: #007bff;
+  text-align: center;
 }
 
 #carrello-container.mostra {
@@ -114,5 +136,14 @@
 
 .hidden {
   display: none;
+}
+
+#nuovo-appuntamento {
+  position: relative;
+}
+
+.titolo-servizi {
+  text-align: center;
+  margin: 1rem 0;
 }
 

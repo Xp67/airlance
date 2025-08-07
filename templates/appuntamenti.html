@@ -2,15 +2,15 @@
 
 {% block content %}
 
-<h2>Prenota Servizi</h2>
+<h2 class="titolo-servizi">Selezione Servizi</h2>
 <form id="nuovo-appuntamento">
   <div id="lista-servizi">
     {% for s in servizi %}
     <div class="servizio-card">
       <img src="{{ s.immagine if s.immagine else 'https://via.placeholder.com/300x200' }}" alt="{{ s.nome }}">
       <h4 class="servizio-titolo">{{ s.nome }}</h4>
-      <p class="servizio-descrizione">{{ s.descrizione }}</p>
       <button type="button" class="add-servizio" data-id="{{ s.id }}" data-nome="{{ s.nome }}">Aggiungi</button>
+      <p class="servizio-descrizione">{{ s.descrizione }}</p>
     </div>
     {% endfor %}
   </div>
