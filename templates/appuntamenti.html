@@ -4,32 +4,24 @@
 
 <h2 class="titolo-servizi">Selezione Servizi</h2>
 <form id="nuovo-appuntamento">
-  <div id="lista-servizi">
-    {% for s in servizi %}
-    <div class="servizio-card">
-      <img src="{{ s.immagine if s.immagine else 'https://via.placeholder.com/300x200' }}" alt="{{ s.nome }}">
-      <h4 class="servizio-titolo">{{ s.nome }}</h4>
-      <button type="button" class="add-servizio" data-id="{{ s.id }}" data-nome="{{ s.nome }}">Aggiungi</button>
-      <p class="servizio-descrizione">{{ s.descrizione }}</p>
-    </div>
-    {% endfor %}
-  </div>
-
-  <div id="seleziona-slot" class="hidden">
-    <label for="data_ora">Scegli giorno e ora:</label>
-    <select id="data_ora" name="data_ora">
-      {% for d in disponibilita %}
-      <option value="{{ d.data_ora }}">{{ d.data_ora }}</option>
+  <div class="appuntamenti-layout">
+    <div id="lista-servizi">
+      {% for s in servizi %}
+      <div class="servizio-card">
+        <img src="{{ s.immagine if s.immagine else 'https://via.placeholder.com/300x200' }}" alt="{{ s.nome }}">
+        <h4 class="servizio-titolo">{{ s.nome }}</h4>
+        <button type="button" class="add-servizio" data-id="{{ s.id }}" data-nome="{{ s.nome }}">Aggiungi</button>
+        <p class="servizio-descrizione">{{ s.descrizione }}</p>
+      </div>
       {% endfor %}
-    </select>
-  </div>
+    </div>
 
-  <div id="carrello-container">
-    <h3>Carrello</h3>
-    <ul id="carrello"></ul>
-    <button type="button" id="procedi-richiesta">Procedi con la richiesta</button>
+    <div id="carrello-container">
+      <h3>Carrello</h3>
+      <ul id="carrello"></ul>
+      <button type="button" id="procedi-richiesta">Procedi con la richiesta</button>
+    </div>
   </div>
-
 </form>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/appuntamenti.css') }}">
 <script src="{{ url_for('static', filename='js/appuntamenti.js') }}"></script>

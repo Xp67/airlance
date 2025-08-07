@@ -1,8 +1,9 @@
 /* Lista servizi */
 #lista-servizi {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 3;
 }
 
 .servizio-card {
@@ -20,19 +21,20 @@
   transition: opacity 0.3s ease;
 }
 
-.servizio-titolo {
-  position: absolute;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 1.2rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 0.2rem 0.5rem;
-}
+  .servizio-titolo {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 1.2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #fff;
+    padding: 0.2rem 0.5rem;
+    display: inline-block;
+    border-radius: 4px;
+  }
 
 .servizio-descrizione {
   position: absolute;
@@ -55,11 +57,10 @@
   opacity: 1;
 }
 
-.servizio-card:hover .servizio-titolo {
-  top: 20%;
-  transform: translate(-50%, -50%) scale(0.8);
-  background: none;
-}
+  .servizio-card:hover .servizio-titolo {
+    top: 20%;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
 
 .servizio-card .add-servizio {
   position: absolute;
@@ -80,18 +81,15 @@
 }
 
 /* Contenitore carrello */
-#carrello-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #f9f9f9;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  display: none;
-  z-index: 10;
-}
+  #carrello-container {
+    background: #f9f9f9;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex: 1;
+  }
 #carrello-container h3 {
   margin-top: 0;
   color: #007bff;
@@ -138,9 +136,14 @@
   display: none;
 }
 
-#nuovo-appuntamento {
-  position: relative;
-}
+  #nuovo-appuntamento {
+    position: relative;
+  }
+
+  .appuntamenti-layout {
+    display: flex;
+    gap: 1rem;
+  }
 
 .titolo-servizi {
   text-align: center;

@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const carrello = [];
   const carrelloEl = document.getElementById('carrello');
   const carrelloContainer = document.getElementById('carrello-container');
-  const slotSection = document.getElementById('seleziona-slot');
   const procediBtn = document.getElementById('procedi-richiesta');
 
   document.querySelectorAll('.add-servizio').forEach((btn) => {
@@ -20,12 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         li.remove();
         if (!carrello.length) {
           carrelloContainer.classList.remove('mostra');
-          slotSection.classList.add('hidden');
         }
       });
 
       carrelloContainer.classList.add('mostra');
-      slotSection.classList.remove('hidden');
     });
   });
 
