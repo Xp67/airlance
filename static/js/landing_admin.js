@@ -14,7 +14,9 @@ function openImageSelector(index) {
         img.onclick = () => selectImage(imgData.web);
         container.appendChild(img);
       });
-      document.getElementById('popup-seleziona-landing').classList.remove('hidden');
+      const popup = document.getElementById('popup-seleziona-landing');
+      popup.classList.remove('hidden');
+      popup.classList.add('visibile');
     });
 }
 
@@ -29,5 +31,7 @@ function selectImage(url) {
 }
 
 function closeImageSelector() {
-  document.getElementById('popup-seleziona-landing').classList.add('hidden');
+  const popup = document.getElementById('popup-seleziona-landing');
+  popup.classList.remove('visibile');
+  popup.classList.add('hidden');
 }
