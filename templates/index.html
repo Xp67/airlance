@@ -6,10 +6,15 @@
     <p>{{ config_ui.hero_subtitle or '' }}</p>
   </section>
 
-<section class="landing-grid">
-  {% for img in config_ui.landing_images or [] %}
-  <div class="portfolio-item"><img src="{{ img }}" alt="Immagine {{ loop.index }}"></div>
-  {% endfor %}
-</section>
+
+  {% set imgs = config_ui.landing_images or [] %}
+  <section class="landing-grid">
+    {% for i in range(9) %}
+      {% set img = imgs[i] if imgs|length > i else '' %}
+      <div class="portfolio-item">
+        {% if img %}<img src="{{ img }}" alt="Immagine {{ i+1 }}">{% endif %}
+      </div>
+    {% endfor %}
+  </section>
 {% endblock %}
 

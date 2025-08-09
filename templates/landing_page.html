@@ -3,23 +3,36 @@
 {% block content %}
 <div class="dashboard-content">
   <h1 class="titolo-sezione">Landing Page</h1>
-  <form method="post" class="user-form">
-    <label for="hero_title">Hero Title</label>
-    <input type="text" id="hero_title" name="hero_title" value="{{ hero_title }}">
+    <form method="post" class="user-form">
+      <label for="hero_title">Hero Title</label>
+      <input type="text" id="hero_title" name="hero_title" value="{{ hero_title }}">
 
-    <label for="hero_subtitle">Hero Subtitle</label>
-    <input type="text" id="hero_subtitle" name="hero_subtitle" value="{{ hero_subtitle }}">
+      <label for="hero_subtitle">Hero Subtitle</label>
+      <input type="text" id="hero_subtitle" name="hero_subtitle" value="{{ hero_subtitle }}">
 
-    <h2>Immagini griglia</h2>
-    {% for i in range(9) %}
-    <div class="form-group">
-      <label for="image{{ i+1 }}">Immagine {{ i+1 }}</label>
-      <input type="text" id="image{{ i+1 }}" name="image{{ i+1 }}" value="{{ images[i] }}">
+      <h2>Immagini griglia</h2>
+      <div class="landing-editor-grid">
+        {% for i in range(9) %}
+        <div class="landing-card" id="card-{{ i }}" onclick="openImageSelector({{ i }})">
+          <img src="{{ images[i] or 'https://via.placeholder.com/300x200?text=Seleziona' }}" alt="Card {{ i+1 }}">
+          <input type="hidden" name="image{{ i+1 }}" id="image{{ i+1 }}" value="{{ images[i] }}">
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-upload">Salva</button>
+    </form>
+
+    <div id="popup-seleziona-landing" class="popup hidden">
+      <div class="popup-content">
+        <button class="close-btn" onclick="closeImageSelector()">X</button>
+        <h3>Scegli immagine</h3>
+        <div id="lista-immagini-landing" class="immagini-thumb"></div>
+      </div>
     </div>
-    {% endfor %}
 
-    <button type="submit" class="btn-upload">Salva</button>
-  </form>
+    <script src="{{ url_for('static', filename='js/landing_admin.js') }}"></script>
+
 </div>
 {% endblock %}
 
