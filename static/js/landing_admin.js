@@ -4,15 +4,14 @@ function openImageSelector(index) {
   currentCard = index;
   fetch('/admin/landing/immagini')
     .then(r => r.json())
-    .then(urls => {
+    .then(images => {
       const container = document.getElementById('lista-immagini-landing');
       container.innerHTML = '';
-      urls.forEach(url => {
+      images.forEach(imgData => {
         const img = document.createElement('img');
-        img.src = url;
-        img.style.width = '100px';
+        img.src = imgData.thumb;
         img.style.cursor = 'pointer';
-        img.onclick = () => selectImage(url);
+        img.onclick = () => selectImage(imgData.web);
         container.appendChild(img);
       });
       document.getElementById('popup-seleziona-landing').classList.remove('hidden');
