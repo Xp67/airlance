@@ -1,5 +1,7 @@
 let currentCard = null;
+
 const placeholder = '/static/img/placeholder.jpg';
+
 
 function openImageSelector(index) {
   currentCard = index;
