@@ -18,12 +18,13 @@
 
   {% elif request.endpoint.startswith('admin.') %}
 
-    <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('admin.carica_immagini') }}">Carica immagini</a>
-    <a href="{{ url_for('admin.gestione_raccolte') }}">Raccolte</a>
-    <a href="{{ url_for('admin.lista_immagini') }}">Lista Immagini</a>
-    <a href="{{ url_for('admin.servizi') }}">Servizi</a>
-    <a href="{{ url_for('admin.richieste_servizi') }}">Richieste Servizi</a>
+      <a href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin.carica_immagini') }}">Carica immagini</a>
+      <a href="{{ url_for('admin.gestione_raccolte') }}">Raccolte</a>
+      <a href="{{ url_for('admin.lista_immagini') }}">Lista Immagini</a>
+      <a href="{{ url_for('admin.landing_page') }}">Landing Page</a>
+      <a href="{{ url_for('admin.servizi') }}">Servizi</a>
+      <a href="{{ url_for('admin.richieste_servizi') }}">Richieste Servizi</a>
 
   {% endif %}
 </div>

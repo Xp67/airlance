@@ -219,6 +219,7 @@ def inject_globals():
         "FOLDER": config.FOLDER,
         "TITOLO_SITO": titolo_sito,
         "CLIENTE_ID": cliente_id,
+        "config_ui": config_ui,
 
     }
 

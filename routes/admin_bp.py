@@ -35,6 +35,41 @@ def clean_servizio_id(nome: str) -> str:
 def admin_dashboard():
     return render_template("admin.html")
 
+
+@admin_bp.route('/landing-page', methods=['GET', 'POST'])
+@admin_required
+def landing_page():
+    if request.method == 'POST':
+        hero_title = request.form.get('hero_title', '').strip()
+        hero_subtitle = request.form.get('hero_subtitle', '').strip()
+        images = [request.form.get(f'image{i}', '').strip() for i in range(1, 10)]
+        g.db.collection('config').document('info').set({
+            'hero_title': hero_title,
+            'hero_subtitle': hero_subtitle,
+            'landing_images': images
+        }, merge=True)
+        flash('Landing page aggiornata')
+        return redirect(url_for('admin.landing_page'))
+
+    doc = g.db.collection('config').document('info').get()
+    data = doc.to_dict() if doc.exists else {}
+    images = data.get('landing_images', [''] * 9)
+    return render_template('landing_page.html',
+                           hero_title=data.get('hero_title', ''),
+                            hero_subtitle=data.get('hero_subtitle', ''),
+                            images=images)
+
+
+@admin_bp.route('/landing/immagini')
+@admin_required
+def lista_immagini_landing():
+    client = storage.Client()
+    bucket = client.bucket(g.bucket_name)
+    blobs = bucket.list_blobs()
+    immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}'
+                for b in blobs if not b.name.endswith('/')]
+    return jsonify(immagini)
+
 @admin_bp.route('/carica-immagini')
 @admin_required
 def carica_immagini():
