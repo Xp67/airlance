@@ -63,11 +63,19 @@ def landing_page():
 @admin_bp.route('/landing/immagini')
 @admin_required
 def lista_immagini_landing():
-    client = storage.Client()
-    bucket = client.bucket(g.bucket_name)
-    blobs = bucket.list_blobs()
-    immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}'
-                for b in blobs if not b.name.endswith('/')]
+    docs = (
+        g.db.collection("foto_pubbliche")
+        .order_by("timestamp", direction=firestore.Query.DESCENDING)
+        .limit(100)
+        .stream()
+    )
+    immagini = []
+    for doc in docs:
+        data = doc.to_dict()
+        immagini.append({
+            "thumb": data.get("thumb"),
+            "web": data.get("web"),
+        })
     return jsonify(immagini)
 
 
