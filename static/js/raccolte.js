@@ -2,7 +2,9 @@ function apriPopup(nomeRaccolta) {
   fetch(`/admin/raccolte/dettaglio/${nomeRaccolta}`)
     .then(res => res.json())
     .then(data => {
-      document.getElementById("popup-raccolta").classList.remove("hidden");
+      const popup = document.getElementById("popup-raccolta");
+      popup.classList.add("visibile");
+      popup.classList.remove("hidden");
       document.getElementById("copertina-popup").src = data.copertina || "/static/img/placeholder.jpg";
       document.getElementById("nome-popup").value = data.nome;
       document.getElementById("id-popup").value = nomeRaccolta;
@@ -37,7 +39,9 @@ function apriPopup(nomeRaccolta) {
 
 
 function chiudiPopup() {
-  document.getElementById("popup-raccolta").classList.add("hidden");
+  const popup = document.getElementById("popup-raccolta");
+  popup.classList.add("hidden");
+  popup.classList.remove("visibile");
 }
 
 let immaginiDisponibili = [];
@@ -63,7 +67,9 @@ function apriPopupCreazione() {
 }
 
 function chiudiPopupCreazione() {
-  document.getElementById("popup-nuova-raccolta").classList.add("hidden");
+  const popup = document.getElementById("popup-nuova-raccolta");
+  popup.classList.add("hidden");
+  popup.classList.remove("visibile");
 }
 
 function apriPopupSelezione() {
@@ -92,7 +98,9 @@ function apriPopupSelezione() {
         container.appendChild(div);
       });
 
-      document.getElementById("popup-selezione-immagini").classList.remove("hidden");
+      const popup = document.getElementById("popup-selezione-immagini");
+      popup.classList.add("visibile");
+      popup.classList.remove("hidden");
     })
     .catch(err => {
       console.error("Errore nel caricamento delle immagini:", err);
@@ -102,7 +110,9 @@ function apriPopupSelezione() {
 
 
 function chiudiPopupSelezione() {
-  document.getElementById("popup-selezione-immagini").classList.add("hidden");
+  const popup = document.getElementById("popup-selezione-immagini");
+  popup.classList.add("hidden");
+  popup.classList.remove("visibile");
 }
 
 function confermaSelezioneImmagini() {
@@ -222,12 +232,16 @@ function apriPopupSelezioneModifica() {
 });
 
 
-      document.getElementById("popup-selezione-immagini-modifica").classList.remove("hidden");
+      const popup = document.getElementById("popup-selezione-immagini-modifica");
+      popup.classList.add("visibile");
+      popup.classList.remove("hidden");
     });
 }
 
 function chiudiPopupSelezioneModifica() {
-  document.getElementById("popup-selezione-immagini-modifica").classList.add("hidden");
+  const popup = document.getElementById("popup-selezione-immagini-modifica");
+  popup.classList.add("hidden");
+  popup.classList.remove("visibile");
 }
 
 function confermaSelezioneImmaginiModifica() {
