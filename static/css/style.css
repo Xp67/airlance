@@ -438,6 +438,15 @@ body {
   display: none;
 }
 
+#popup-nuova-raccolta {
+  z-index: 10000;
+}
+
+#popup-selezione-immagini,
+#popup-selezione-immagini-modifica {
+  z-index: 10001;
+}
+
 .popup-content {
   background: white;
   padding: 2rem;
