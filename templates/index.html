@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+  {% set imgs = config_ui.landing_images or [] %}
+
   <section class="hero">
     <h1>{{ config_ui.hero_title or '' }}</h1>
     <p>{{ config_ui.hero_subtitle or '' }}</p>
   </section>
 
-
-  {% set imgs = config_ui.landing_images or [] %}
   <section class="landing-grid">
     {% for i in range(9) %}
       {% set img = imgs[i] if imgs|length > i else '' %}
