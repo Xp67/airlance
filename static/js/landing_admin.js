@@ -1,4 +1,5 @@
 let currentCard = null;
+const placeholder = '/static/img/placeholder.jpg';
 
 function openImageSelector(index) {
   currentCard = index;
@@ -26,6 +27,8 @@ function selectImage(url) {
     const inputEl = document.getElementById(`image${currentCard + 1}`);
     if (imgEl) imgEl.src = url;
     if (inputEl) inputEl.value = url;
+    const btnEl = document.querySelector(`#card-${currentCard} .remove-btn`);
+    if (btnEl) btnEl.style.display = 'flex';
   }
   closeImageSelector();
 }
@@ -34,4 +37,14 @@ function closeImageSelector() {
   const popup = document.getElementById('popup-seleziona-landing');
   popup.classList.remove('visibile');
   popup.classList.add('hidden');
+}
+
+function removeImage(event, index) {
+  event.stopPropagation();
+  const imgEl = document.querySelector(`#card-${index} img`);
+  const inputEl = document.getElementById(`image${index + 1}`);
+  const btnEl = document.querySelector(`#card-${index} .remove-btn`);
+  if (imgEl) imgEl.src = placeholder;
+  if (inputEl) inputEl.value = '';
+  if (btnEl) btnEl.style.display = 'none';
 }
