@@ -134,10 +134,12 @@ body {
 body {
   min-height: 100vh;
 }
+
 /* Hero section */
 .hero {
   width: 100%;
   min-height: 40vh;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -145,6 +147,7 @@ body {
   text-align: center;
   color: var(--colore-primario);
   padding: 1rem;
+
 }
 
 
@@ -196,6 +199,7 @@ body {
   height: 100%;
   object-fit: cover;
 }
+
 
 .portfolio-grid {
   display: grid;

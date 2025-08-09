@@ -56,8 +56,8 @@ def landing_page():
     images = data.get('landing_images', [''] * 9)
     return render_template('landing_page.html',
                            hero_title=data.get('hero_title', ''),
-                            hero_subtitle=data.get('hero_subtitle', ''),
-                            images=images)
+                           hero_subtitle=data.get('hero_subtitle', ''),
+                           images=images)
 
 
 @admin_bp.route('/landing/immagini')
@@ -69,6 +69,7 @@ def lista_immagini_landing():
     immagini = [f'https://storage.googleapis.com/{g.bucket_name}/{b.name}'
                 for b in blobs if not b.name.endswith('/')]
     return jsonify(immagini)
+
 
 @admin_bp.route('/carica-immagini')
 @admin_required
