@@ -14,7 +14,8 @@
       <div class="landing-editor-grid">
         {% for i in range(9) %}
         <div class="landing-card" id="card-{{ i }}" onclick="openImageSelector({{ i }})">
-          <img src="{{ images[i] or 'https://via.placeholder.com/100?text=Seleziona' }}" alt="Card {{ i+1 }}">
+          <img src="{{ images[i] or '/static/img/placeholder.jpg' }}" alt="Card {{ i+1 }}">
+
           <button type="button" class="remove-btn" onclick="removeImage(event, {{ i }})" style="display: {{ 'flex' if images[i] else 'none' }};">✖</button>
           <input type="hidden" name="image{{ i+1 }}" id="image{{ i+1 }}" value="{{ images[i] }}">
         </div>

@@ -1,5 +1,7 @@
 let currentCard = null;
-const placeholder = 'https://via.placeholder.com/100?text=Seleziona';
+
+const placeholder = '/static/img/placeholder.jpg';
+
 
 function openImageSelector(index) {
   currentCard = index;
