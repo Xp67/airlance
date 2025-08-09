@@ -52,7 +52,6 @@ function apriPopupCreazione() {
   popup.classList.add("visibile");
   popup.classList.remove("hidden");
 
-  console.log("Popup nuova raccolta aperto");
   const triggerBtn = document.querySelector(".nuova-raccolta-btn");
   if (triggerBtn) {
     const originalText = triggerBtn.textContent;
@@ -137,8 +136,6 @@ function confermaSelezioneImmagini() {
 function salvaNuovaRaccolta() {
   const nome = document.getElementById("nome-nuovo").value.trim();
   const descrizione = document.getElementById("descrizione-nuovo").value.trim();
-    console.log("→ nome:", nome);
-    console.log("→ immagini:", immaginiSelezionate);
   if (!nome || immaginiSelezionate.length === 0) {
     alert("Devi inserire un nome e selezionare almeno un'immagine.");
     return;
