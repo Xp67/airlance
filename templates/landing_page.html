@@ -1,0 +1,25 @@
+{% extends "profilo.html" %}
+
+{% block content %}
+<div class="dashboard-content">
+  <h1 class="titolo-sezione">Landing Page</h1>
+  <form method="post" class="user-form">
+    <label for="hero_title">Hero Title</label>
+    <input type="text" id="hero_title" name="hero_title" value="{{ hero_title }}">
+
+    <label for="hero_subtitle">Hero Subtitle</label>
+    <input type="text" id="hero_subtitle" name="hero_subtitle" value="{{ hero_subtitle }}">
+
+    <h2>Immagini griglia</h2>
+    {% for i in range(9) %}
+    <div class="form-group">
+      <label for="image{{ i+1 }}">Immagine {{ i+1 }}</label>
+      <input type="text" id="image{{ i+1 }}" name="image{{ i+1 }}" value="{{ images[i] }}">
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn-upload">Salva</button>
+  </form>
+</div>
+{% endblock %}
+

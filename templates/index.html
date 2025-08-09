@@ -1,14 +1,15 @@
-
 {% extends "base.html" %}
 
 {% block content %}
+  <section class="hero">
+    <h1>{{ config_ui.hero_title or '' }}</h1>
+    <p>{{ config_ui.hero_subtitle or '' }}</p>
+  </section>
 
-    <section class="portfolio-grid">
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/1.JPG') }}" alt="Look 1"></div>
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/2.JPG') }}" alt="Look 2"></div>
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/3.JPG') }}" alt="Look 3"></div>
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/4.JPG') }}" alt="Look 4"></div>
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/5.jpg') }}" alt="Look 5"></div>
-    <div class="portfolio-item"><img src="{{ url_for('static', filename='immagini/6.JPG') }}" alt="Look 6"></div>
-    </section>
+<section class="landing-grid">
+  {% for img in config_ui.landing_images or [] %}
+  <div class="portfolio-item"><img src="{{ img }}" alt="Immagine {{ loop.index }}"></div>
+  {% endfor %}
+</section>
 {% endblock %}
+
