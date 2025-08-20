@@ -1,0 +1,47 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tenant_id", "order": "ASCENDING"},
+        {"fieldPath": "start_utc", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tenant_id", "order": "ASCENDING"},
+        {"fieldPath": "staff_id", "order": "ASCENDING"},
+        {"fieldPath": "start_utc", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "bookings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tenant_id", "order": "ASCENDING"},
+        {"fieldPath": "resource_id", "order": "ASCENDING"},
+        {"fieldPath": "start_utc", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "holds",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tenant_id", "order": "ASCENDING"},
+        {"fieldPath": "expire_at", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "slot_cache",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "tenant_id", "order": "ASCENDING"},
+        {"fieldPath": "key", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
