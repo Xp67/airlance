@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def _generate_ics(event: dict, tenant: str) -> str:
-    start = event.get("start")
-    end = event.get("end", start)
+    start = event.get("start_utc")
+    end = event.get("end_utc", start)
     uid = f"{event['id']}@{tenant}"
     dtstamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     return (
@@ -28,8 +28,8 @@ def _generate_ics(event: dict, tenant: str) -> str:
 
 def _send_email_with_ics(recipient: str, ics_content: str) -> None:
     """Placeholder email sender that logs the ICS payload."""
-    logger.info("📧 Invio conferma prenotazione a %s", recipient)
-    logger.debug("ICS contenuto:\n%s", ics_content)
+    logger.info("📧 Sending booking confirmation to %s", recipient)
+    logger.debug("ICS content:\n%s", ics_content)
 
 
 @booking_bp.route("/api/booking/confirm/<booking_id>", methods=["POST"])
@@ -45,8 +45,8 @@ def confirm_checkout(booking_id: str):
     tenant = getattr(g, "cliente_id", "default")
     event = {
         "id": booking_id,
-        "start": booking.get("start"),
-        "end": booking.get("end", booking.get("start")),
+        "start_utc": booking.get("start_utc"),
+        "end_utc": booking.get("end_utc", booking.get("start_utc")),
     }
     ics_content = _generate_ics(event, tenant)
     recipient = booking.get("email")
@@ -88,8 +88,8 @@ def public_ical_feed():
     events = []
     for doc in bookings:
         data = doc.to_dict()
-        start = data.get("start")
-        end = data.get("end", start)
+        start = data.get("start_utc")
+        end = data.get("end_utc", start)
         events.append(
             "BEGIN:VEVENT\n"
             f"UID:{doc.id}@{tenant}\n"
@@ -99,5 +99,9 @@ def public_ical_feed():
             f"SUMMARY:Booking {doc.id}\n"
             "END:VEVENT\n"
         )
-    ical = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Airlance//EN\n" + "".join(events) + "END:VCALENDAR\n"
+    ical = (
+        "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Airlance//EN\n"
+        + "".join(events)
+        + "END:VCALENDAR\n"
+    )
     return current_app.response_class(ical, mimetype="text/calendar")
