@@ -8,7 +8,11 @@ from routes.admin_bp import admin_bp
 from routes.task_bp import task_bp
 from routes.public_bp import public_bp
 from routes.schedule_bp import schedule_bp
+
 from routes.booking_bp import booking_bp
+
+from routes.booking_api import booking_api
+
 import json
 from jinja2 import ChoiceLoader, FileSystemLoader  # type: ignore
 import os
@@ -154,7 +158,11 @@ app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(task_bp, url_prefix="/task")
 app.register_blueprint(schedule_bp)
 app.register_blueprint(public_bp)
+
 app.register_blueprint(booking_bp)
+
+app.register_blueprint(booking_api, url_prefix="/api")
+
 
 
 @app.before_request
