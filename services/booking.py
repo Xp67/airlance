@@ -6,34 +6,29 @@ from google.cloud import firestore
 import logging
 from flask import g
 from services.calendar import add_event
+from services import firestore as firestore_service
 
 logger = logging.getLogger(__name__)
 
 
 def create_booking(data: dict) -> dict:
     """Persist a booking request and sync with the calendar if possible."""
-    g.db.collection("appuntamenti").add(
-        {
-            "freelancer_id": data["freelancer_id"],
-            "cliente_id": data["cliente_id"],
-            "data_ora": data["data_ora"],
-            "servizi": data["servizi"],
-            "stato": "richiesta",
-        }
-    )
+    db = g.db
+    payload = {**data, "status": data.get("status", "pending")}
+    booking_id = firestore_service.create_booking(db, payload)
     try:
         add_event(
-            g.db,
-            data["freelancer_id"],
+            db,
+            data["staff_id"],
             {
-                "summary": f"Richiesta servizi {', '.join(data['servizi'])}",
-                "start": {"dateTime": data["data_ora"]},
-                "end": {"dateTime": data["data_ora"]},
+                "summary": f"Booking for {data.get('resource_id')}",
+                "start": {"dateTime": data["start_utc"]},
+                "end": {"dateTime": data["end_utc"]},
             },
         )
     except Exception as e:  # pragma: no cover - log but do not fail
-        logger.warning("Impossibile sincronizzare evento calendario: %s", e)
-    return {"success": True}
+        logger.warning("Failed to sync calendar: %s", e)
+    return {**payload, "id": booking_id}
 
 def create_hold(
     db: firestore.Client,

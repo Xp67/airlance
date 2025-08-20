@@ -15,10 +15,10 @@ def get_availability():
 
 @booking_api.route("/booking", methods=["POST"])
 def create_booking_route():
-    """Create a new booking using provided JSON payload."""
+    """Create a new booking using the provided JSON payload."""
     data = request.get_json() or {}
-    required = {"freelancer_id", "cliente_id", "data_ora", "servizi"}
+    required = {"tenant_id", "staff_id", "resource_id", "start_utc", "end_utc"}
     if not required.issubset(data):
-        return jsonify({"error": "Dati mancanti"}), 400
+        return jsonify({"error": "Missing required fields"}), 400
     result = booking.create_booking(data)
     return jsonify(result), 201
