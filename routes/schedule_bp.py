@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, g  # type: ignore
 import logging
 from services.calendar import add_event
+from services.availability import invalidate_slot_cache
 
 schedule_bp = Blueprint("schedule", __name__)
 logger = logging.getLogger(__name__)
@@ -47,5 +48,22 @@ def crea_appuntamento():
 
     except Exception as e:  # pragma: no cover - log but do not fail
         logger.warning("Impossibile sincronizzare evento calendario: %s", e)
+    invalidate_slot_cache(
+        g.db, data["servizi"], (data["data_ora"] or "")[:10]
+    )
 
     return jsonify({"success": True}), 201
+
+
+@schedule_bp.route("/appuntamenti/<id>", methods=["DELETE"])
+def cancella_appuntamento(id):
+    doc_ref = g.db.collection("appuntamenti").document(id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        return jsonify({"error": "Appuntamento non trovato"}), 404
+    dati = doc.to_dict()
+    doc_ref.delete()
+    invalidate_slot_cache(
+        g.db, dati.get("servizi", []), (dati.get("data_ora", "") or "")[:10]
+    )
+    return jsonify({"success": True})
